@@ -82,7 +82,7 @@ export default function App() {
   }, [view, lists, createTask]);
 
   return (
-    <div className="flex h-screen bg-gray-50 relative">
+    <div className="flex h-screen bg-gray-50 relative overflow-hidden">
       {/* Mobile header bar */}
       <div className="fixed top-0 left-0 right-0 z-30 flex items-center gap-3 px-4 py-3 bg-[#15BFAE] md:hidden">
         <button onClick={toggleSidebar} className="text-white">
