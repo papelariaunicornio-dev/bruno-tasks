@@ -37,6 +37,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
   const isCompleted = !!task.completed;
   const isPriority = !!task.priority;
   const isInProgress = !!task.in_progress;
+  const isDelegated = !!task.delegated;
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.Id,
@@ -226,6 +227,24 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
               fill={isPriority ? 'white' : '#d1d5db'}
               stroke="none"
             />
+          </svg>
+        </button>
+
+        {/* Delegated (bookmark with user icon) */}
+        <button
+          className="flex-shrink-0 transition-opacity hover:opacity-80 -mt-1 -mb-1"
+          onClick={() => updateTask.mutate({ id: task.Id, delegated: !isDelegated })}
+          title="Delegada"
+        >
+          <svg width="24" height="36" viewBox="0 0 24 36">
+            <path
+              d="M2 0h20a2 2 0 012 2v30l-12-6L0 32V2a2 2 0 012-2z"
+              fill={isDelegated ? '#22c55e' : 'none'}
+              stroke={isDelegated ? '#22c55e' : '#d1d5db'}
+              strokeWidth="1.5"
+            />
+            <circle cx="12" cy="11" r="3.5" fill={isDelegated ? 'white' : '#d1d5db'} stroke="none" />
+            <path d="M6.5 21.5c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" fill={isDelegated ? 'white' : '#d1d5db'} stroke="none" />
           </svg>
         </button>
 

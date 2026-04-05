@@ -73,6 +73,9 @@ export function TaskList() {
   } else if (view.type === 'priority') {
     filteredTasks = allTasks.filter((t) => !!t.priority);
     viewTitle = 'Prioridade';
+  } else if (view.type === 'delegated') {
+    filteredTasks = allTasks.filter((t) => !!t.delegated);
+    viewTitle = 'Delegadas';
   } else {
     filteredTasks = allTasks;
     viewTitle = 'Todas as tarefas';
@@ -114,7 +117,7 @@ export function TaskList() {
     }
   }
 
-  const groupByList = view.type === 'tag' || view.type === 'all' || view.type === 'in_progress' || view.type === 'priority';
+  const groupByList = view.type === 'tag' || view.type === 'all' || view.type === 'in_progress' || view.type === 'priority' || view.type === 'delegated';
 
   function renderTaskGroup(tasks: Task[], completedList: Task[]) {
     return (

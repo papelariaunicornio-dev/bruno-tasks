@@ -49,6 +49,7 @@ export function useCreateTask() {
         completed: false,
         priority: false,
         in_progress: false,
+        delegated: false,
         position: Date.now(),
         list_id: data.list_id ?? 0,
         parent_id: data.parent_id ?? null,

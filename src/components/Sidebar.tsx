@@ -283,6 +283,20 @@ export function Sidebar() {
           Prioridade
           <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.priority && !t.completed).length}</span>
         </button>
+        <button
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-base transition-colors ${
+            view.type === 'delegated' ? 'bg-green-50 text-green-600 font-medium' : 'text-gray-700 hover:bg-gray-100'
+          }`}
+          onClick={() => setView({ type: 'delegated' })}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path d="M6 2h12a1 1 0 011 1v18l-6.5-4L6 21V3a1 1 0 011-1z" fill={view.type === 'delegated' ? '#22c55e' : 'none'} stroke={view.type === 'delegated' ? '#22c55e' : '#9ca3af'} strokeWidth="1.5" />
+            <circle cx="12" cy="8.5" r="2.5" fill={view.type === 'delegated' ? 'white' : '#9ca3af'} stroke="none" />
+            <path d="M7.5 16c0-2.5 2-4.5 4.5-4.5s4.5 2 4.5 4.5" fill={view.type === 'delegated' ? 'white' : '#9ca3af'} stroke="none" />
+          </svg>
+          Delegadas
+          <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.delegated && !t.completed).length}</span>
+        </button>
       </div>
 
       <div className="border-b border-gray-100 mx-3 my-1" />
