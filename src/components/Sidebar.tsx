@@ -67,7 +67,7 @@ export function Sidebar() {
   }
 
   function getTaskCount(listId: number) {
-    return allTasks.filter((t) => t.list_id === listId && !t.parent_id && !t.completed).length;
+    return allTasks.filter((t) => t.list_id === listId && !t.parent_id && !t.completed && !t.deleted).length;
   }
 
   function handleRenameList(id: number) {
@@ -406,8 +406,8 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Dashboard button */}
-      <div className="border-t border-gray-100 px-3 py-2">
+      {/* Dashboard & Trash */}
+      <div className="border-t border-gray-100 px-3 py-2 space-y-0.5">
         <button
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-base transition-colors ${
             view.type === 'stats' ? 'bg-[#15BFAE]/10 text-[#15BFAE] font-medium' : 'text-gray-700 hover:bg-gray-100'
@@ -418,6 +418,18 @@ export function Sidebar() {
             <path d="M18 20V10M12 20V4M6 20v-6" />
           </svg>
           Dashboard
+        </button>
+        <button
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-base transition-colors ${
+            view.type === 'trash' ? 'bg-gray-100 text-gray-700 font-medium' : 'text-gray-500 hover:bg-gray-100'
+          }`}
+          onClick={() => setView({ type: 'trash' })}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={view.type === 'trash' ? '#6b7280' : '#9ca3af'} strokeWidth="1.5">
+            <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" />
+          </svg>
+          Lixeira
+          <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.deleted).length}</span>
         </button>
       </div>
 

@@ -58,35 +58,41 @@ export function TaskList() {
   let filteredTasks: Task[];
   let viewTitle: string;
 
+  // Filter out deleted tasks (except in trash view)
+  const visibleTasks = view.type === 'trash' ? allTasks.filter((t) => !!t.deleted) : allTasks.filter((t) => !t.deleted);
+
   if (view.type === 'list') {
-    filteredTasks = allTasks.filter((t) => t.list_id === view.listId);
+    filteredTasks = visibleTasks.filter((t) => t.list_id === view.listId);
     const list = lists.find((l) => l.Id === view.listId);
     viewTitle = list?.title ?? 'Lista';
   } else if (view.type === 'tag') {
     const tagTaskIds = taskTags.filter((tt) => tt.tag_id === view.tagId).map((tt) => tt.task_id);
-    filteredTasks = allTasks.filter((t) => tagTaskIds.includes(t.Id));
+    filteredTasks = visibleTasks.filter((t) => tagTaskIds.includes(t.Id));
     const tag = allTagsList.find((t) => t.Id === view.tagId);
     viewTitle = tag?.name ?? '';
   } else if (view.type === 'in_progress') {
-    filteredTasks = allTasks.filter((t) => !!t.in_progress);
+    filteredTasks = visibleTasks.filter((t) => !!t.in_progress);
     viewTitle = 'Em andamento';
   } else if (view.type === 'priority') {
-    filteredTasks = allTasks.filter((t) => !!t.priority);
+    filteredTasks = visibleTasks.filter((t) => !!t.priority);
     viewTitle = 'Prioridade';
   } else if (view.type === 'delegated') {
-    filteredTasks = allTasks.filter((t) => !!t.delegated);
+    filteredTasks = visibleTasks.filter((t) => !!t.delegated);
     viewTitle = 'Delegadas';
+  } else if (view.type === 'trash') {
+    filteredTasks = visibleTasks;
+    viewTitle = 'Lixeira';
   } else {
-    filteredTasks = allTasks;
+    filteredTasks = visibleTasks;
     viewTitle = 'Todas as tarefas';
   }
 
   const rootTasks = filteredTasks.filter((t) => !t.parent_id);
-  const activeTasks = rootTasks.filter((t) => !t.completed);
+  const pendingTasks = rootTasks.filter((t) => !t.completed);
   const completedTasks = rootTasks.filter((t) => !!t.completed);
   const getSubtasks = (parentId: number) =>
     sortTasks(filteredTasks.filter((t) => t.parent_id === parentId), sortBy);
-  const sortedActiveTasks = sortTasks(activeTasks, sortBy);
+  const sortedActiveTasks = sortTasks(pendingTasks, sortBy);
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
@@ -156,7 +162,7 @@ export function TaskList() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto" style={{ backgroundColor: '#15BFAE' }}>
+    <div className="flex-1 overflow-y-auto" style={{ backgroundColor: '#025960' }}>
       <div className="max-w-3xl mx-auto px-6 py-8 min-h-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

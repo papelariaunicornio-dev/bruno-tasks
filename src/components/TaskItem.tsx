@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useUpdateTask, useDeleteTask, useCreateTask } from '../hooks/useTasks';
-import { useTaskTags, useRemoveTaskTag } from '../hooks/useTags';
+import { useTaskTags } from '../hooks/useTags';
 import { useTags } from '../hooks/useTags';
 import { useAppState } from '../store/appState';
 import { TagBadge } from './TagBadge';
@@ -19,6 +19,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(task.title);
   const [showTagSelector, setShowTagSelector] = useState(false);
+  const [subtasksCollapsed, setSubtasksCollapsed] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const updateTask = useUpdateTask();
@@ -26,8 +27,8 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
   const createTask = useCreateTask();
   const { data: allTags = [] } = useTags();
   const { data: taskTags = [] } = useTaskTags();
-  const removeTaskTag = useRemoveTaskTag();
   const setView = useAppState((s) => s.setView);
+  const showToast = useAppState((s) => s.showToast);
   const editingTaskId = useAppState((s) => s.editingTaskId);
   const setEditingTaskId = useAppState((s) => s.setEditingTaskId);
 
@@ -107,7 +108,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
           e.dataTransfer.setData('task-id', String(task.Id));
           e.dataTransfer.effectAllowed = 'move';
         }}
-        className={`group flex items-start gap-3 px-4 py-3 bg-white rounded-md mb-[2px] shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-shadow ${
+        className={`group relative flex items-start gap-3 px-4 py-3 bg-white rounded-md mb-[2px] shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-shadow ${
           isCompleted ? 'opacity-70' : ''
         }`}
       >
@@ -188,50 +189,8 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
           #
         </button>
 
-        {/* Flags group */}
+        {/* Flags group: delegada, em andamento, prioridade */}
         <div className="flex gap-0.5 flex-shrink-0">
-
-        {/* In Progress (bookmark with play - Wunderlist style) */}
-        <button
-          className="transition-opacity hover:opacity-80 -mt-1 -mb-1"
-          onClick={() => updateTask.mutate({ id: task.Id, in_progress: !isInProgress })}
-          title="Em andamento"
-        >
-          <svg width="24" height="36" viewBox="0 0 24 36">
-            <path
-              d="M2 0h20a2 2 0 012 2v30l-12-6L0 32V2a2 2 0 012-2z"
-              fill={isInProgress ? '#3b82f6' : 'none'}
-              stroke={isInProgress ? '#3b82f6' : '#d1d5db'}
-              strokeWidth="1.5"
-            />
-            <polygon
-              points="9,10 9,20 17,15"
-              fill={isInProgress ? 'white' : '#d1d5db'}
-              stroke="none"
-            />
-          </svg>
-        </button>
-
-        {/* Priority (bookmark with star - Wunderlist style) */}
-        <button
-          className="transition-opacity hover:opacity-80 -mt-1 -mb-1"
-          onClick={() => updateTask.mutate({ id: task.Id, priority: !isPriority })}
-          title="Importante"
-        >
-          <svg width="24" height="36" viewBox="0 0 24 36">
-            <path
-              d="M2 0h20a2 2 0 012 2v30l-12-6L0 32V2a2 2 0 012-2z"
-              fill={isPriority ? '#ef4444' : 'none'}
-              stroke={isPriority ? '#ef4444' : '#d1d5db'}
-              strokeWidth="1.5"
-            />
-            <path
-              d="M12 7l2 4 4.5.7-3.2 3.1.8 4.5L12 17l-4.1 2.3.8-4.5-3.2-3.1 4.5-.7z"
-              fill={isPriority ? 'white' : '#d1d5db'}
-              stroke="none"
-            />
-          </svg>
-        </button>
 
         {/* Delegated (bookmark with user icon) */}
         <button
@@ -240,37 +199,71 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
           title="Delegada"
         >
           <svg width="24" height="36" viewBox="0 0 24 36">
-            <path
-              d="M2 0h20a2 2 0 012 2v30l-12-6L0 32V2a2 2 0 012-2z"
-              fill={isDelegated ? '#22c55e' : 'none'}
-              stroke={isDelegated ? '#22c55e' : '#d1d5db'}
-              strokeWidth="1.5"
-            />
+            <path d="M2 0h20a2 2 0 012 2v30l-12-6L0 32V2a2 2 0 012-2z" fill={isDelegated ? '#22c55e' : 'none'} stroke={isDelegated ? '#22c55e' : '#d1d5db'} strokeWidth="1.5" />
             <circle cx="12" cy="11" r="3.5" fill={isDelegated ? 'white' : '#d1d5db'} stroke="none" />
             <path d="M6.5 21.5c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" fill={isDelegated ? 'white' : '#d1d5db'} stroke="none" />
           </svg>
         </button>
 
+        {/* In Progress (bookmark with play) */}
+        <button
+          className="transition-opacity hover:opacity-80 -mt-1 -mb-1"
+          onClick={() => updateTask.mutate({ id: task.Id, in_progress: !isInProgress })}
+          title="Em andamento"
+        >
+          <svg width="24" height="36" viewBox="0 0 24 36">
+            <path d="M2 0h20a2 2 0 012 2v30l-12-6L0 32V2a2 2 0 012-2z" fill={isInProgress ? '#3b82f6' : 'none'} stroke={isInProgress ? '#3b82f6' : '#d1d5db'} strokeWidth="1.5" />
+            <polygon points="9,10 9,20 17,15" fill={isInProgress ? 'white' : '#d1d5db'} stroke="none" />
+          </svg>
+        </button>
+
+        {/* Priority (bookmark with star) */}
+        <button
+          className="transition-opacity hover:opacity-80 -mt-1 -mb-1"
+          onClick={() => updateTask.mutate({ id: task.Id, priority: !isPriority })}
+          title="Importante"
+        >
+          <svg width="24" height="36" viewBox="0 0 24 36">
+            <path d="M2 0h20a2 2 0 012 2v30l-12-6L0 32V2a2 2 0 012-2z" fill={isPriority ? '#ef4444' : 'none'} stroke={isPriority ? '#ef4444' : '#d1d5db'} strokeWidth="1.5" />
+            <path d="M12 7l2 4 4.5.7-3.2 3.1.8 4.5L12 17l-4.1 2.3.8-4.5-3.2-3.1 4.5-.7z" fill={isPriority ? 'white' : '#d1d5db'} stroke="none" />
+          </svg>
+        </button>
+
         </div>{/* end flags group */}
 
-        {/* Delete */}
+        {/* Subtask collapse toggle */}
+        {subtasks.length > 0 && (
+          <button
+            className="flex-shrink-0 text-gray-300 hover:text-gray-500 mt-1"
+            onClick={() => setSubtasksCollapsed(!subtasksCollapsed)}
+            title={subtasksCollapsed ? 'Expandir subtarefas' : 'Recolher subtarefas'}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className={`transition-transform ${subtasksCollapsed ? '' : 'rotate-90'}`}>
+              <path d="M8 5l8 7-8 7z" />
+            </svg>
+            <span className="text-[10px] ml-0.5">{subtasks.length}</span>
+          </button>
+        )}
+
+        {/* Delete - circle in top right corner */}
         <button
-          className="opacity-0 group-hover:opacity-30 hover:!opacity-100 text-gray-400 hover:text-red-400"
+          className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600"
           onClick={() => {
-            if (!task.title || confirm('Excluir esta tarefa?')) {
-              taskTags.filter((tt) => tt.task_id === task.Id).forEach((tt) => removeTaskTag.mutate(tt.Id));
-              deleteTask.mutate(task.Id);
-            }
+            const taskTitle = task.title || 'Tarefa';
+            updateTask.mutate({ id: task.Id, deleted: true, deleted_at: new Date().toISOString() });
+            showToast(`"${taskTitle}" excluida`, () => {
+              updateTask.mutate({ id: task.Id, deleted: false, deleted_at: null });
+            });
           }}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </button>
       </div>
 
       {/* Subtasks */}
-      {subtasks.map((sub) => (
+      {!subtasksCollapsed && subtasks.map((sub) => (
         <TaskItem key={sub.Id} task={sub} depth={depth + 1} subtasks={[]} />
       ))}
     </>

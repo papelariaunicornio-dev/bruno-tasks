@@ -14,6 +14,8 @@ export interface Task {
   priority: boolean;
   in_progress: boolean;
   delegated: boolean;
+  deleted: boolean;
+  deleted_at: string | null;
   position: number;
   list_id: number;
   parent_id: number | null;
@@ -43,6 +45,7 @@ export type ViewMode =
   | { type: 'in_progress' }
   | { type: 'priority' }
   | { type: 'delegated' }
+  | { type: 'trash' }
   | { type: 'stats' };
 
 export const TAG_COLORS = [

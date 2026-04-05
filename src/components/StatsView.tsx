@@ -95,7 +95,7 @@ export function StatsView() {
   }, [lists]);
 
   return (
-    <div className="flex-1 overflow-y-auto" style={{ backgroundColor: '#15BFAE' }}>
+    <div className="flex-1 overflow-y-auto" style={{ backgroundColor: '#025960' }}>
       <div className="max-w-4xl mx-auto px-6 py-8 min-h-full">
         <h1 className="text-2xl font-bold text-white mb-6">Dashboard</h1>
 

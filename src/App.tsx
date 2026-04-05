@@ -4,6 +4,7 @@ import { TaskList } from './components/TaskList';
 import { StatsView } from './components/StatsView';
 import { CommandPalette } from './components/CommandPalette';
 import { QuickAdd } from './components/QuickAdd';
+import { Toast } from './components/Toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCreateTask } from './hooks/useTasks';
 import { useLists } from './hooks/useLists';
@@ -16,6 +17,8 @@ export default function App() {
   const createTask = useCreateTask();
   const { data: lists = [] } = useLists();
   const view = useAppState((s) => s.view);
+  const toast = useAppState((s) => s.toast);
+  const hideToast = useAppState((s) => s.hideToast);
   const sidebarOpen = useAppState((s) => s.sidebarOpen);
   const toggleSidebar = useAppState((s) => s.toggleSidebar);
   const setSidebarOpen = useAppState((s) => s.setSidebarOpen);
@@ -112,12 +115,19 @@ export default function App() {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col pt-14 md:pt-0 overflow-hidden" style={{ backgroundColor: '#15BFAE' }}>
+      <div className="flex-1 flex flex-col pt-14 md:pt-0 overflow-hidden" style={{ backgroundColor: '#025960' }}>
         {view.type === 'stats' ? <StatsView /> : <TaskList />}
       </div>
 
       <CommandPalette />
       <QuickAdd />
+      {toast && (
+        <Toast
+          message={toast.message}
+          onUndo={toast.onUndo}
+          onClose={hideToast}
+        />
+      )}
     </div>
   );
 }
