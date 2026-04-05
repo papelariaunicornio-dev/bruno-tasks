@@ -92,10 +92,33 @@ export function useUpdateTask() {
     onMutate: async ({ id, ...data }) => {
       await qc.cancelQueries({ queryKey: ['tasks', 'all'] });
       const previous = qc.getQueryData<Task[]>(['tasks', 'all']);
-      qc.setQueryData<Task[]>(['tasks', 'all'], (old = []) =>
-        old.map((t) => (t.Id === id ? { ...t, ...data } : t))
-      );
+      qc.setQueryData<Task[]>(['tasks', 'all'], (old = []) => {
+        let updated = old.map((t) => (t.Id === id ? { ...t, ...data } : t));
+        // Propagate in_progress to parent when subtask gets the flag
+        if (data.in_progress) {
+          const task = old.find((t) => t.Id === id);
+          if (task?.parent_id) {
+            updated = updated.map((t) =>
+              t.Id === task.parent_id ? { ...t, in_progress: true } : t
+            );
+          }
+        }
+        return updated;
+      });
       return { previous };
+    },
+    onSuccess: (_result, { id, ...data }) => {
+      // Propagate in_progress flag to parent task in the API
+      if (data.in_progress) {
+        const allTasks = qc.getQueryData<Task[]>(['tasks', 'all']) ?? [];
+        const task = allTasks.find((t) => t.Id === id);
+        if (task?.parent_id) {
+          const parent = allTasks.find((t) => t.Id === task.parent_id);
+          if (parent && !parent.in_progress) {
+            api.update<Task>('tasks', parent.Id, { in_progress: true, updated_at: new Date().toISOString() });
+          }
+        }
+      }
     },
     onError: (_err, _vars, context) => {
       if (context?.previous) qc.setQueryData(['tasks', 'all'], context.previous);

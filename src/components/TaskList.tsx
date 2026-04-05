@@ -64,7 +64,7 @@ export function TaskList() {
   if (view.type === 'list') {
     filteredTasks = visibleTasks.filter((t) => t.list_id === view.listId);
     const list = lists.find((l) => l.Id === view.listId);
-    viewTitle = list?.title ?? 'Lista';
+    viewTitle = (list?.emoji ? list.emoji + ' ' : '') + (list?.title ?? 'Lista');
   } else if (view.type === 'tag') {
     const tagTaskIds = taskTags.filter((tt) => tt.tag_id === view.tagId).map((tt) => tt.task_id);
     filteredTasks = visibleTasks.filter((t) => tagTaskIds.includes(t.Id));
@@ -198,7 +198,7 @@ export function TaskList() {
             return (
               <div key={list.Id} className="mb-6">
                 <h2 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-2 px-1">
-                  {list.title}
+                  {list.emoji && <span className="mr-1">{list.emoji}</span>}{list.title}
                 </h2>
                 {renderTaskGroup(listActive, listCompleted)}
               </div>

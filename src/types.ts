@@ -1,6 +1,7 @@
 export interface List {
   Id: number;
   title: string;
+  emoji: string;
   group_name: string;
   position: number;
   created_at: string;
@@ -46,7 +47,14 @@ export type ViewMode =
   | { type: 'priority' }
   | { type: 'delegated' }
   | { type: 'trash' }
-  | { type: 'stats' };
+  | { type: 'stats' }
+  | { type: 'kanban' };
+
+export const LIST_EMOJIS = [
+  '📋', '📝', '✅', '📌', '🎯', '💡', '🔥', '⭐', '🚀', '💼',
+  '🏠', '🛒', '💰', '📚', '🎨', '🎵', '🏋️', '❤️', '🎁', '📞',
+  '🍔', '✈️', '🔧', '📅', '🌟', '🎬', '💻', '🧹', '🐛', '📦',
+];
 
 export const TAG_COLORS = [
   { name: 'Red', value: '#ef4444' },

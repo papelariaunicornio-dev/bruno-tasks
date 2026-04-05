@@ -4,6 +4,7 @@ import { useTags, useDeleteTag } from '../hooks/useTags';
 import { useAllTasks, useUpdateTask } from '../hooks/useTasks';
 import { useAppState } from '../store/appState';
 import { Pomodoro } from './Pomodoro';
+import { EmojiPicker } from './EmojiPicker';
 
 interface ContextMenu {
   x: number;
@@ -34,6 +35,7 @@ export function Sidebar() {
   const [renamingListId, setRenamingListId] = useState<number | null>(null);
   const [renamingGroupName, setRenamingGroupName] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const [emojiPickerListId, setEmojiPickerListId] = useState<number | null>(null);
   const addMenuRef = useRef<HTMLDivElement>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -179,9 +181,13 @@ export function Sidebar() {
             }`}
             onClick={() => setView({ type: 'list', listId: list.Id })}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isActive ? '#15BFAE' : '#9ca3af'} strokeWidth="1.5">
-              <path d="M3 7h18M3 12h18M3 17h18" />
-            </svg>
+            {list.emoji ? (
+              <span className="text-lg leading-none">{list.emoji}</span>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isActive ? '#15BFAE' : '#9ca3af'} strokeWidth="1.5">
+                <path d="M3 7h18M3 12h18M3 17h18" />
+              </svg>
+            )}
             <span className="flex-1 text-left truncate">{list.title}</span>
             {count > 0 && <span className="text-xs text-gray-400">{count}</span>}
           </button>
@@ -406,8 +412,21 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Dashboard & Trash */}
+      {/* Kanban, Dashboard & Trash */}
       <div className="border-t border-gray-100 px-3 py-2 space-y-0.5">
+        <button
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-base transition-colors ${
+            view.type === 'kanban' ? 'bg-[#15BFAE]/10 text-[#15BFAE] font-medium' : 'text-gray-700 hover:bg-gray-100'
+          }`}
+          onClick={() => setView({ type: 'kanban' })}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={view.type === 'kanban' ? '#15BFAE' : '#9ca3af'} strokeWidth="1.5">
+            <rect x="2" y="3" width="6" height="18" rx="1" />
+            <rect x="9" y="3" width="6" height="12" rx="1" />
+            <rect x="16" y="3" width="6" height="15" rx="1" />
+          </svg>
+          Kanban
+        </button>
         <button
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-base transition-colors ${
             view.type === 'stats' ? 'bg-[#15BFAE]/10 text-[#15BFAE] font-medium' : 'text-gray-700 hover:bg-gray-100'
@@ -462,6 +481,18 @@ export function Sidebar() {
             </svg>
             Renomear
           </button>
+          {contextMenu.type === 'list' && contextMenu.id && (
+            <button
+              className="w-full text-left px-3 py-2 text-base text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+              onClick={() => {
+                setEmojiPickerListId(contextMenu.id!);
+                setContextMenu(null);
+              }}
+            >
+              <span className="text-sm">😀</span>
+              Emoji
+            </button>
+          )}
           <button
             className="w-full text-left px-3 py-2 text-base hover:bg-gray-50 text-red-500 flex items-center gap-2"
             onClick={() => {
@@ -479,6 +510,20 @@ export function Sidebar() {
             </svg>
             Excluir
           </button>
+        </div>
+      )}
+      {/* Emoji picker */}
+      {emojiPickerListId && (
+        <div className="fixed inset-0 z-[60]" onClick={() => setEmojiPickerListId(null)}>
+          <div
+            className="absolute top-1/3 left-16"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <EmojiPicker
+              onSelect={(emoji) => updateList.mutate({ id: emojiPickerListId, emoji })}
+              onClose={() => setEmojiPickerListId(null)}
+            />
+          </div>
         </div>
       )}
     </aside>

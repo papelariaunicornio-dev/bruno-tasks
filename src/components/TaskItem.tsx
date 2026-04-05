@@ -112,18 +112,31 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
           isCompleted ? 'opacity-70' : ''
         }`}
       >
-        {/* Drag handle (for dnd-kit reorder) */}
-        <button
-          {...attributes}
-          {...listeners}
-          className="opacity-0 group-hover:opacity-30 cursor-grab active:cursor-grabbing text-gray-400 -ml-2 mt-1"
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-            <circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" />
-            <circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" />
-            <circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" />
-          </svg>
-        </button>
+        {/* Subtask collapse toggle (left side) */}
+        {subtasks.length > 0 ? (
+          <button
+            className="flex-shrink-0 text-gray-300 hover:text-gray-500 mt-1.5 -ml-1 w-5 flex items-center justify-center"
+            onClick={() => setSubtasksCollapsed(!subtasksCollapsed)}
+            title={subtasksCollapsed ? 'Expandir subtarefas' : 'Recolher subtarefas'}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className={`transition-transform ${subtasksCollapsed ? '' : 'rotate-90'}`}>
+              <path d="M8 5l8 7-8 7z" />
+            </svg>
+          </button>
+        ) : (
+          /* Drag handle (for dnd-kit reorder) */
+          <button
+            {...attributes}
+            {...listeners}
+            className="opacity-0 group-hover:opacity-30 cursor-grab active:cursor-grabbing text-gray-400 -ml-1 mt-1 w-5 flex items-center justify-center"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" />
+              <circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" />
+              <circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" />
+            </svg>
+          </button>
+        )}
 
         {/* Circular checkbox */}
         <button
@@ -231,29 +244,26 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
 
         </div>{/* end flags group */}
 
-        {/* Subtask collapse toggle */}
+        {/* Subtask count badge */}
         {subtasks.length > 0 && (
-          <button
-            className="flex-shrink-0 text-gray-300 hover:text-gray-500 mt-1"
-            onClick={() => setSubtasksCollapsed(!subtasksCollapsed)}
-            title={subtasksCollapsed ? 'Expandir subtarefas' : 'Recolher subtarefas'}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className={`transition-transform ${subtasksCollapsed ? '' : 'rotate-90'}`}>
-              <path d="M8 5l8 7-8 7z" />
-            </svg>
-            <span className="text-[10px] ml-0.5">{subtasks.length}</span>
-          </button>
+          <span className="flex-shrink-0 text-[10px] text-gray-400 bg-gray-100 rounded-full px-1.5 py-0.5 mt-1">
+            {subtasks.length}
+          </span>
         )}
 
         {/* Delete - circle in top right corner */}
         <button
           className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600"
           onClick={() => {
-            const taskTitle = task.title || 'Tarefa';
-            updateTask.mutate({ id: task.Id, deleted: true, deleted_at: new Date().toISOString() });
-            showToast(`"${taskTitle}" excluida`, () => {
-              updateTask.mutate({ id: task.Id, deleted: false, deleted_at: null });
-            });
+            if (!task.title?.trim()) {
+              // Blank tasks: hard delete, no trash
+              deleteTask.mutate(task.Id);
+            } else {
+              updateTask.mutate({ id: task.Id, deleted: true, deleted_at: new Date().toISOString() });
+              showToast(`"${task.title}" excluida`, () => {
+                updateTask.mutate({ id: task.Id, deleted: false, deleted_at: null });
+              });
+            }
           }}
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
