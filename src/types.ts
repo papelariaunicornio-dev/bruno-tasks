@@ -17,6 +17,7 @@ export interface Task {
   parent_id: number | null;
   created_at: string;
   updated_at: string;
+  completed_at: string | null;
 }
 
 export interface Tag {
@@ -36,7 +37,8 @@ export type SortCriteria = 'manual' | 'alphabetical' | 'created' | 'priority';
 export type ViewMode =
   | { type: 'list'; listId: number }
   | { type: 'tag'; tagId: number }
-  | { type: 'all' };
+  | { type: 'all' }
+  | { type: 'stats' };
 
 export const TAG_COLORS = [
   { name: 'Red', value: '#ef4444' },

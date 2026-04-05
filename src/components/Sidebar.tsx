@@ -366,6 +366,21 @@ export function Sidebar() {
         </div>
       </div>
 
+      {/* Dashboard button */}
+      <div className="border-t border-gray-100 px-3 py-2">
+        <button
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+            view.type === 'stats' ? 'bg-[#15BFAE]/10 text-[#15BFAE] font-medium' : 'text-gray-700 hover:bg-gray-100'
+          }`}
+          onClick={() => setView({ type: 'stats' })}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={view.type === 'stats' ? '#15BFAE' : '#9ca3af'} strokeWidth="1.5">
+            <path d="M18 20V10M12 20V4M6 20v-6" />
+          </svg>
+          Dashboard
+        </button>
+      </div>
+
       {/* Pomodoro */}
       <Pomodoro />
 

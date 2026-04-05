@@ -129,7 +129,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
               ? 'bg-[#15BFAE] border-[#15BFAE] text-white'
               : 'border-gray-300 hover:border-[#15BFAE]'
           }`}
-          onClick={() => updateTask.mutate({ id: task.Id, completed: !isCompleted })}
+          onClick={() => updateTask.mutate({ id: task.Id, completed: !isCompleted, completed_at: !isCompleted ? new Date().toISOString() : null })}
         >
           {isCompleted && (
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">

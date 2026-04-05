@@ -51,6 +51,7 @@ export function useCreateTask() {
         position: Date.now(),
         list_id: data.list_id ?? 0,
         parent_id: data.parent_id ?? null,
+        completed_at: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };

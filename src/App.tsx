@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { TaskList } from './components/TaskList';
+import { StatsView } from './components/StatsView';
 import { CommandPalette } from './components/CommandPalette';
 import { useCreateTask } from './hooks/useTasks';
 import { useLists } from './hooks/useLists';
@@ -80,7 +81,7 @@ export default function App() {
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
-      <TaskList />
+      {view.type === 'stats' ? <StatsView /> : <TaskList />}
       <CommandPalette />
     </div>
   );
