@@ -188,9 +188,12 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
           #
         </button>
 
+        {/* Flags group */}
+        <div className="flex gap-0.5 flex-shrink-0">
+
         {/* In Progress (bookmark with play - Wunderlist style) */}
         <button
-          className="flex-shrink-0 transition-opacity hover:opacity-80 -mt-1 -mb-1"
+          className="transition-opacity hover:opacity-80 -mt-1 -mb-1"
           onClick={() => updateTask.mutate({ id: task.Id, in_progress: !isInProgress })}
           title="Em andamento"
         >
@@ -211,7 +214,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
 
         {/* Priority (bookmark with star - Wunderlist style) */}
         <button
-          className="flex-shrink-0 transition-opacity hover:opacity-80 -mt-1 -mb-1"
+          className="transition-opacity hover:opacity-80 -mt-1 -mb-1"
           onClick={() => updateTask.mutate({ id: task.Id, priority: !isPriority })}
           title="Importante"
         >
@@ -232,7 +235,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
 
         {/* Delegated (bookmark with user icon) */}
         <button
-          className="flex-shrink-0 transition-opacity hover:opacity-80 -mt-1 -mb-1"
+          className="transition-opacity hover:opacity-80 -mt-1 -mb-1"
           onClick={() => updateTask.mutate({ id: task.Id, delegated: !isDelegated })}
           title="Delegada"
         >
@@ -247,6 +250,8 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
             <path d="M6.5 21.5c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" fill={isDelegated ? 'white' : '#d1d5db'} stroke="none" />
           </svg>
         </button>
+
+        </div>{/* end flags group */}
 
         {/* Delete */}
         <button
