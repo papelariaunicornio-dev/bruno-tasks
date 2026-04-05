@@ -112,7 +112,7 @@ export default function App() {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 pt-14 md:pt-0">
+      <div className="flex-1 flex flex-col pt-14 md:pt-0 overflow-hidden" style={{ backgroundColor: '#15BFAE' }}>
         {view.type === 'stats' ? <StatsView /> : <TaskList />}
       </div>
 
