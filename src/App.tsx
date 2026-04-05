@@ -3,6 +3,7 @@ import { Sidebar } from './components/Sidebar';
 import { TaskList } from './components/TaskList';
 import { StatsView } from './components/StatsView';
 import { CommandPalette } from './components/CommandPalette';
+import { QuickAdd } from './components/QuickAdd';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCreateTask } from './hooks/useTasks';
 import { useLists } from './hooks/useLists';
@@ -116,6 +117,7 @@ export default function App() {
       </div>
 
       <CommandPalette />
+      <QuickAdd />
     </div>
   );
 }
