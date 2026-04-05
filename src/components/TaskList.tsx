@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -45,6 +45,12 @@ export function TaskList() {
   const { view, sortBy } = useAppState();
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [showCompleted, setShowCompleted] = useState(true);
+  const newTaskInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-focus input on load and view change
+  useEffect(() => {
+    setTimeout(() => newTaskInputRef.current?.focus(), 100);
+  }, [view]);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -89,10 +95,15 @@ export function TaskList() {
     if (e.key === 'Enter' && newTaskTitle.trim()) {
       const listId = view.type === 'list' ? view.listId : lists[0]?.Id;
       if (!listId) return;
-      createTask.mutate({ title: newTaskTitle.trim(), list_id: listId, _autoFocus: true });
+      createTask.mutate({ title: newTaskTitle.trim(), list_id: listId });
       setNewTaskTitle('');
+      // Keep focus on the input for sequential task creation
+      newTaskInputRef.current?.focus();
     }
-    if (e.key === 'Escape') setNewTaskTitle('');
+    if (e.key === 'Escape') {
+      setNewTaskTitle('');
+      newTaskInputRef.current?.blur();
+    }
   }
 
   const groupByList = view.type === 'tag' || view.type === 'all';
@@ -149,12 +160,14 @@ export function TaskList() {
               <path d="M12 5v14M5 12h14" />
             </svg>
             <input
+              ref={newTaskInputRef}
               type="text"
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
               onKeyDown={handleNewTask}
               placeholder="Adicionar uma tarefa"
               className="flex-1 bg-transparent text-sm outline-none text-white placeholder-white/60"
+              autoFocus
             />
           </div>
         )}
