@@ -156,8 +156,8 @@ export function TaskList() {
 
         {/* New task input */}
         {(view.type === 'list' || lists.length > 0) && (
-          <div className="flex items-center gap-3 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-md mb-4 border border-white/20">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="opacity-60">
+          <div className="flex items-center gap-3 px-4 py-4 bg-white/20 backdrop-blur-sm rounded-md mb-4 border border-white/20">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="opacity-60">
               <path d="M12 5v14M5 12h14" />
             </svg>
             <input
@@ -167,7 +167,7 @@ export function TaskList() {
               onChange={(e) => setNewTaskTitle(e.target.value)}
               onKeyDown={handleNewTask}
               placeholder="Adicionar uma tarefa"
-              className="flex-1 bg-transparent text-sm outline-none text-white placeholder-white/60"
+              className="flex-1 bg-transparent text-base outline-none text-white placeholder-white/60"
               autoFocus
             />
           </div>

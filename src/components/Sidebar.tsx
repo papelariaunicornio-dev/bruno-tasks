@@ -166,14 +166,14 @@ export function Sidebar() {
               if (e.key === 'Escape') { setRenamingListId(null); setRenameValue(''); }
             }}
             onBlur={() => handleRenameList(list.Id)}
-            className={`w-full text-sm rounded px-3 py-2 ${indented ? 'ml-4' : ''} outline-none border border-[#15BFAE] bg-white`}
+            className={`w-full text-base rounded px-3 py-2 ${indented ? 'ml-4' : ''} outline-none border border-[#15BFAE] bg-white`}
           />
         ) : (
           <button
             draggable
             onDragStart={(e) => handleDragStart(e, list.Id)}
             onContextMenu={(e) => handleContextMenu(e, 'list', list.Id)}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 ${indented ? 'pl-7' : ''} text-sm transition-colors rounded-md cursor-grab active:cursor-grabbing ${
+            className={`w-full flex items-center gap-3 px-3 py-2.5 ${indented ? 'pl-7' : ''} text-base transition-colors rounded-md cursor-grab active:cursor-grabbing ${
               isTaskDropTarget ? 'bg-[#15BFAE]/20 ring-1 ring-[#15BFAE]' :
               isActive ? 'bg-[#15BFAE]/10 text-[#15BFAE] font-medium' : 'text-gray-700 hover:bg-gray-100'
             }`}
@@ -194,7 +194,7 @@ export function Sidebar() {
     <aside className="w-full bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0">
       {/* Header */}
       <div className="px-4 pt-5 pb-3 flex items-center justify-between">
-        <h1 className="text-base font-bold text-gray-800 tracking-tight">Bruno Tasks</h1>
+        <h1 className="text-lg font-bold text-gray-800 tracking-tight">Bruno Tasks</h1>
         <div ref={addMenuRef} className="relative">
           <button
             className="w-7 h-7 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
@@ -207,7 +207,7 @@ export function Sidebar() {
           {showAddMenu && (
             <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
               <button
-                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                className="w-full text-left px-3 py-2 text-base text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                 onClick={() => { setCreatingType('list'); setShowAddMenu(false); }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#15BFAE" strokeWidth="2">
@@ -216,7 +216,7 @@ export function Sidebar() {
                 Nova lista
               </button>
               <button
-                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                className="w-full text-left px-3 py-2 text-base text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                 onClick={() => { setCreatingType('group'); setShowAddMenu(false); }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
@@ -233,7 +233,7 @@ export function Sidebar() {
       <div className="px-3 mb-2">
         <button
           onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }))}
-          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-400 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
+          className="w-full flex items-center gap-2 px-3 py-2 text-base text-gray-400 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
@@ -246,7 +246,7 @@ export function Sidebar() {
       {/* Built-in views */}
       <div className="px-3 mb-1">
         <button
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors ${
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-base transition-colors ${
             view.type === 'all' ? 'bg-[#15BFAE]/10 text-[#15BFAE] font-medium' : 'text-gray-700 hover:bg-gray-100'
           }`}
           onClick={() => setView({ type: 'all' })}
@@ -280,7 +280,7 @@ export function Sidebar() {
               }}
               onBlur={() => { if (!newName.trim()) { setCreatingType(null); setNewName(''); } }}
               placeholder={creatingType === 'list' ? 'Nome da lista' : 'Nome do grupo'}
-              className="w-full text-sm rounded-md px-3 py-2 outline-none border border-[#15BFAE] bg-white"
+              className="w-full text-base rounded-md px-3 py-2 outline-none border border-[#15BFAE] bg-white"
               autoFocus
             />
           </div>
@@ -344,7 +344,7 @@ export function Sidebar() {
           {tags.map((tag) => (
             <div key={tag.Id} className="group flex items-center">
               <button
-                className={`flex-1 flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                className={`flex-1 flex items-center gap-2 px-3 py-1.5 rounded-md text-base transition-colors ${
                   view.type === 'tag' && view.tagId === tag.Id ? 'bg-gray-100 font-medium' : 'hover:bg-gray-50'
                 }`}
                 onClick={() => setView({ type: 'tag', tagId: tag.Id })}
@@ -369,7 +369,7 @@ export function Sidebar() {
       {/* Dashboard button */}
       <div className="border-t border-gray-100 px-3 py-2">
         <button
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-base transition-colors ${
             view.type === 'stats' ? 'bg-[#15BFAE]/10 text-[#15BFAE] font-medium' : 'text-gray-700 hover:bg-gray-100'
           }`}
           onClick={() => setView({ type: 'stats' })}
@@ -388,7 +388,7 @@ export function Sidebar() {
       <div className="border-t border-gray-100 px-3 py-2">
         <button
           onClick={() => { setCreatingType('list'); }}
-          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#15BFAE] hover:bg-[#15BFAE]/5 rounded-md transition-colors"
+          className="w-full flex items-center gap-2 px-3 py-2 text-base text-[#15BFAE] hover:bg-[#15BFAE]/5 rounded-md transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M12 5v14M5 12h14" />
@@ -405,7 +405,7 @@ export function Sidebar() {
           style={{ left: contextMenu.x, top: contextMenu.y }}
         >
           <button
-            className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+            className="w-full text-left px-3 py-2 text-base text-gray-700 hover:bg-gray-50 flex items-center gap-2"
             onClick={() => {
               if (contextMenu.type === 'list' && contextMenu.id) {
                 const list = lists.find((l) => l.Id === contextMenu.id);
@@ -424,7 +424,7 @@ export function Sidebar() {
             Renomear
           </button>
           <button
-            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 text-red-500 flex items-center gap-2"
+            className="w-full text-left px-3 py-2 text-base hover:bg-gray-50 text-red-500 flex items-center gap-2"
             onClick={() => {
               if (contextMenu.type === 'list' && contextMenu.id) {
                 const list = lists.find((l) => l.Id === contextMenu.id);

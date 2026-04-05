@@ -105,7 +105,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
           e.dataTransfer.setData('task-id', String(task.Id));
           e.dataTransfer.effectAllowed = 'move';
         }}
-        className={`group flex items-center gap-3 px-4 py-3 bg-white rounded-md mb-[2px] shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-shadow ${
+        className={`group flex items-center gap-3 px-4 py-4 bg-white rounded-md mb-[2px] shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-shadow ${
           isCompleted ? 'opacity-70' : ''
         }`}
       >
@@ -124,7 +124,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
 
         {/* Circular checkbox */}
         <button
-          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+          className={`w-7 h-7 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
             isCompleted
               ? 'bg-[#15BFAE] border-[#15BFAE] text-white'
               : 'border-gray-300 hover:border-[#15BFAE]'
@@ -132,7 +132,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
           onClick={() => updateTask.mutate({ id: task.Id, completed: !isCompleted, completed_at: !isCompleted ? new Date().toISOString() : null })}
         >
           {isCompleted && (
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <path d="M5 13l4 4L19 7" />
             </svg>
           )}
@@ -148,11 +148,11 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
               onChange={(e) => setEditValue(e.target.value)}
               onBlur={() => handleSave()}
               onKeyDown={handleKeyDown}
-              className="w-full bg-transparent text-sm outline-none py-0.5"
+              className="w-full bg-transparent text-base outline-none py-0.5"
             />
           ) : (
             <span
-              className={`text-sm cursor-text block truncate ${isCompleted ? 'line-through text-gray-400' : 'text-gray-800'}`}
+              className={`text-base cursor-text block truncate ${isCompleted ? 'line-through text-gray-400' : 'text-gray-800'}`}
               onClick={() => {
                 setEditing(true);
                 setEditValue(task.title);
@@ -194,7 +194,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
           onClick={() => updateTask.mutate({ id: task.Id, priority: !isPriority })}
           title="Importante"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill={isPriority ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill={isPriority ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5">
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
           </svg>
         </button>
