@@ -191,7 +191,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-screen flex-shrink-0">
+    <aside className="w-full bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0">
       {/* Header */}
       <div className="px-4 pt-5 pb-3 flex items-center justify-between">
         <h1 className="text-base font-bold text-gray-800 tracking-tight">Bruno Tasks</h1>

@@ -15,6 +15,9 @@ export default function App() {
   const createTask = useCreateTask();
   const { data: lists = [] } = useLists();
   const view = useAppState((s) => s.view);
+  const sidebarOpen = useAppState((s) => s.sidebarOpen);
+  const toggleSidebar = useAppState((s) => s.toggleSidebar);
+  const setSidebarOpen = useAppState((s) => s.setSidebarOpen);
   const inboxChecked = useRef(false);
 
   // Ensure Inbox list exists and handle URL task creation
@@ -25,18 +28,16 @@ export default function App() {
       if (inboxChecked.current) return;
       inboxChecked.current = true;
 
-      // Find or create Inbox
       let inbox = lists.find((l) => l.title === 'Inbox');
       if (!inbox) {
         inbox = await api.create<List>('lists', {
           title: 'Inbox',
           group_name: '',
-          position: 0, // Always first
+          position: 0,
           created_at: new Date().toISOString(),
         });
       }
 
-      // Check URL for task parameter
       const params = new URLSearchParams(window.location.search);
       const taskTitle = params.get('task');
       if (taskTitle && inbox) {
@@ -49,12 +50,9 @@ export default function App() {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         });
-        // Invalidate cache so task appears immediately
         queryClient.invalidateQueries({ queryKey: ['tasks'] });
         queryClient.invalidateQueries({ queryKey: ['lists'] });
-        // Clean URL without reload
         window.history.replaceState({}, '', window.location.pathname);
-        // Show confirmation briefly
         document.title = `✓ "${taskTitle}" adicionada`;
         setTimeout(() => { document.title = 'Bruno Tasks'; }, 2000);
       }
@@ -84,9 +82,39 @@ export default function App() {
   }, [view, lists, createTask]);
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      {view.type === 'stats' ? <StatsView /> : <TaskList />}
+    <div className="flex h-screen bg-gray-50 relative">
+      {/* Mobile header bar */}
+      <div className="fixed top-0 left-0 right-0 z-30 flex items-center gap-3 px-4 py-3 bg-[#15BFAE] md:hidden">
+        <button onClick={toggleSidebar} className="text-white">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M3 12h18M3 6h18M3 18h18" />
+          </svg>
+        </button>
+        <h1 className="text-white font-semibold text-base">Bruno Tasks</h1>
+      </div>
+
+      {/* Backdrop (mobile) */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`
+        fixed inset-y-0 left-0 z-50 w-72 transform transition-transform duration-200 ease-in-out
+        md:relative md:translate-x-0 md:w-64 md:z-auto
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <Sidebar />
+      </div>
+
+      {/* Main content */}
+      <div className="flex-1 pt-14 md:pt-0">
+        {view.type === 'stats' ? <StatsView /> : <TaskList />}
+      </div>
+
       <CommandPalette />
     </div>
   );
