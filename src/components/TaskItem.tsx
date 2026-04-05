@@ -36,6 +36,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
 
   const isCompleted = !!task.completed;
   const isPriority = !!task.priority;
+  const isInProgress = !!task.in_progress;
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.Id,
@@ -186,16 +187,53 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
           #
         </button>
 
-        {/* Star (priority) */}
+        {/* In Progress (flag with play) */}
         <button
           className={`flex-shrink-0 transition-colors ${
-            isPriority ? 'text-[#F2A30F]' : 'text-gray-200 hover:text-gray-400'
+            isInProgress ? 'text-[#3b82f6]' : 'text-gray-200 hover:text-gray-400'
+          }`}
+          onClick={() => updateTask.mutate({ id: task.Id, in_progress: !isInProgress })}
+          title="Em andamento"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24">
+            <path
+              d="M5 2v20M5 4h12l-3 4 3 4H5"
+              fill={isInProgress ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinejoin="round"
+            />
+            {isInProgress && (
+              <polygon points="9.5,5.5 9.5,10.5 13.5,8" fill="white" stroke="none" />
+            )}
+          </svg>
+        </button>
+
+        {/* Priority (flag with star - Wunderlist style) */}
+        <button
+          className={`flex-shrink-0 transition-colors ${
+            isPriority ? 'text-[#ef4444]' : 'text-gray-200 hover:text-gray-400'
           }`}
           onClick={() => updateTask.mutate({ id: task.Id, priority: !isPriority })}
           title="Importante"
         >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill={isPriority ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          <svg width="20" height="20" viewBox="0 0 24 24">
+            {/* Flag shape */}
+            <path
+              d="M5 2v20M5 4h12l-3 4 3 4H5"
+              fill={isPriority ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinejoin="round"
+            />
+            {/* Star inside flag */}
+            {isPriority && (
+              <path
+                d="M11 5.5l1.1 2.2 2.4.4-1.7 1.7.4 2.4L11 11l-2.2 1.2.4-2.4-1.7-1.7 2.4-.4z"
+                fill="white"
+                stroke="none"
+              />
+            )}
           </svg>
         </button>
 

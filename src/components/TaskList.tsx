@@ -28,11 +28,12 @@ function sortTasks(tasks: Task[], sortBy: SortCriteria): Task[] {
       sorted.sort((a, b) => a.position - b.position);
       break;
   }
-  // Priority on top
-  const priority = sorted.filter((t) => !!t.priority && !t.completed);
-  const rest = sorted.filter((t) => !t.priority && !t.completed);
+  // In progress first, then priority, then rest, completed last
+  const inProgress = sorted.filter((t) => !!t.in_progress && !t.completed);
+  const priority = sorted.filter((t) => !!t.priority && !t.in_progress && !t.completed);
+  const rest = sorted.filter((t) => !t.priority && !t.in_progress && !t.completed);
   const completed = sorted.filter((t) => !!t.completed);
-  return [...priority, ...rest, ...completed];
+  return [...inProgress, ...priority, ...rest, ...completed];
 }
 
 export function TaskList() {
@@ -66,6 +67,12 @@ export function TaskList() {
     filteredTasks = allTasks.filter((t) => tagTaskIds.includes(t.Id));
     const tag = allTagsList.find((t) => t.Id === view.tagId);
     viewTitle = tag?.name ?? '';
+  } else if (view.type === 'in_progress') {
+    filteredTasks = allTasks.filter((t) => !!t.in_progress);
+    viewTitle = 'Em andamento';
+  } else if (view.type === 'priority') {
+    filteredTasks = allTasks.filter((t) => !!t.priority);
+    viewTitle = 'Prioridade';
   } else {
     filteredTasks = allTasks;
     viewTitle = 'Todas as tarefas';
@@ -107,7 +114,7 @@ export function TaskList() {
     }
   }
 
-  const groupByList = view.type === 'tag' || view.type === 'all';
+  const groupByList = view.type === 'tag' || view.type === 'all' || view.type === 'in_progress' || view.type === 'priority';
 
   function renderTaskGroup(tasks: Task[], completedList: Task[]) {
     return (

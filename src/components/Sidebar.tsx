@@ -244,7 +244,7 @@ export function Sidebar() {
       </div>
 
       {/* Built-in views */}
-      <div className="px-3 mb-1">
+      <div className="px-3 mb-1 space-y-0.5">
         <button
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-base transition-colors ${
             view.type === 'all' ? 'bg-[#15BFAE]/10 text-[#15BFAE] font-medium' : 'text-gray-700 hover:bg-gray-100'
@@ -256,6 +256,32 @@ export function Sidebar() {
           </svg>
           Todas
           <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !t.parent_id && !t.completed).length}</span>
+        </button>
+        <button
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-base transition-colors ${
+            view.type === 'in_progress' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-100'
+          }`}
+          onClick={() => setView({ type: 'in_progress' })}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path d="M5 2v20M5 4h12l-3 4 3 4H5" fill={view.type === 'in_progress' ? '#3b82f6' : 'none'} stroke={view.type === 'in_progress' ? '#3b82f6' : '#9ca3af'} strokeWidth="1.5" strokeLinejoin="round" />
+            {view.type === 'in_progress' && <polygon points="9.5,5.5 9.5,10.5 13.5,8" fill="white" stroke="none" />}
+          </svg>
+          Em andamento
+          <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.in_progress && !t.completed).length}</span>
+        </button>
+        <button
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-base transition-colors ${
+            view.type === 'priority' ? 'bg-red-50 text-red-500 font-medium' : 'text-gray-700 hover:bg-gray-100'
+          }`}
+          onClick={() => setView({ type: 'priority' })}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path d="M5 2v20M5 4h12l-3 4 3 4H5" fill={view.type === 'priority' ? '#ef4444' : 'none'} stroke={view.type === 'priority' ? '#ef4444' : '#9ca3af'} strokeWidth="1.5" strokeLinejoin="round" />
+            {view.type === 'priority' && <path d="M11 5.5l1.1 2.2 2.4.4-1.7 1.7.4 2.4L11 11l-2.2 1.2.4-2.4-1.7-1.7 2.4-.4z" fill="white" stroke="none" />}
+          </svg>
+          Prioridade
+          <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.priority && !t.completed).length}</span>
         </button>
       </div>
 
