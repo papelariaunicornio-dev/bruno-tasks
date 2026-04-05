@@ -3,6 +3,7 @@ import { Sidebar } from './components/Sidebar';
 import { TaskList } from './components/TaskList';
 import { StatsView } from './components/StatsView';
 import { CommandPalette } from './components/CommandPalette';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCreateTask } from './hooks/useTasks';
 import { useLists } from './hooks/useLists';
 import { useAppState } from './store/appState';
@@ -10,6 +11,7 @@ import { api } from './api/nocodb';
 import type { List } from './types';
 
 export default function App() {
+  const queryClient = useQueryClient();
   const createTask = useCreateTask();
   const { data: lists = [] } = useLists();
   const view = useAppState((s) => s.view);
@@ -47,6 +49,9 @@ export default function App() {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         });
+        // Invalidate cache so task appears immediately
+        queryClient.invalidateQueries({ queryKey: ['tasks'] });
+        queryClient.invalidateQueries({ queryKey: ['lists'] });
         // Clean URL without reload
         window.history.replaceState({}, '', window.location.pathname);
         // Show confirmation briefly
