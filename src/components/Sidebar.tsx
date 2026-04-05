@@ -264,8 +264,8 @@ export function Sidebar() {
           onClick={() => setView({ type: 'in_progress' })}
         >
           <svg width="18" height="18" viewBox="0 0 24 24">
-            <path d="M5 2v20M5 4h12l-3 4 3 4H5" fill={view.type === 'in_progress' ? '#3b82f6' : 'none'} stroke={view.type === 'in_progress' ? '#3b82f6' : '#9ca3af'} strokeWidth="1.5" strokeLinejoin="round" />
-            {view.type === 'in_progress' && <polygon points="9.5,5.5 9.5,10.5 13.5,8" fill="white" stroke="none" />}
+            <path d="M6 2h12a1 1 0 011 1v18l-6.5-4L6 21V3a1 1 0 011-1z" fill={view.type === 'in_progress' ? '#3b82f6' : 'none'} stroke={view.type === 'in_progress' ? '#3b82f6' : '#9ca3af'} strokeWidth="1.5" />
+            <polygon points="10.5,8 10.5,14 15,11" fill={view.type === 'in_progress' ? 'white' : '#9ca3af'} stroke="none" />
           </svg>
           Em andamento
           <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.in_progress && !t.completed).length}</span>
@@ -277,8 +277,8 @@ export function Sidebar() {
           onClick={() => setView({ type: 'priority' })}
         >
           <svg width="18" height="18" viewBox="0 0 24 24">
-            <path d="M5 2v20M5 4h12l-3 4 3 4H5" fill={view.type === 'priority' ? '#ef4444' : 'none'} stroke={view.type === 'priority' ? '#ef4444' : '#9ca3af'} strokeWidth="1.5" strokeLinejoin="round" />
-            {view.type === 'priority' && <path d="M11 5.5l1.1 2.2 2.4.4-1.7 1.7.4 2.4L11 11l-2.2 1.2.4-2.4-1.7-1.7 2.4-.4z" fill="white" stroke="none" />}
+            <path d="M6 2h12a1 1 0 011 1v18l-6.5-4L6 21V3a1 1 0 011-1z" fill={view.type === 'priority' ? '#ef4444' : 'none'} stroke={view.type === 'priority' ? '#ef4444' : '#9ca3af'} strokeWidth="1.5" />
+            <path d="M12 6.5l1.2 2.4 2.6.4-1.9 1.8.4 2.6L12 12.5l-2.3 1.2.4-2.6-1.9-1.8 2.6-.4z" fill={view.type === 'priority' ? 'white' : '#9ca3af'} stroke="none" />
           </svg>
           Prioridade
           <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.priority && !t.completed).length}</span>
