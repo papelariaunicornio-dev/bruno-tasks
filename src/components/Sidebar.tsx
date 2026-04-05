@@ -4,7 +4,6 @@ import { useTags, useDeleteTag } from '../hooks/useTags';
 import { useAllTasks, useUpdateTask } from '../hooks/useTasks';
 import { useAppState } from '../store/appState';
 import { Pomodoro } from './Pomodoro';
-import { EmojiPicker } from './EmojiPicker';
 
 interface ContextMenu {
   x: number;
@@ -35,7 +34,9 @@ export function Sidebar() {
   const [renamingListId, setRenamingListId] = useState<number | null>(null);
   const [renamingGroupName, setRenamingGroupName] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
-  const [emojiPickerListId, setEmojiPickerListId] = useState<number | null>(null);
+  const [emojiInputListId, setEmojiInputListId] = useState<number | null>(null);
+  const [emojiInputValue, setEmojiInputValue] = useState('');
+  const emojiInputRef = useRef<HTMLInputElement>(null);
   const addMenuRef = useRef<HTMLDivElement>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -52,6 +53,7 @@ export function Sidebar() {
 
   useEffect(() => { if (creatingType) inputRef.current?.focus(); }, [creatingType]);
   useEffect(() => { if (renamingListId || renamingGroupName) renameInputRef.current?.focus(); }, [renamingListId, renamingGroupName]);
+  useEffect(() => { if (emojiInputListId) emojiInputRef.current?.focus(); }, [emojiInputListId]);
 
   const ungroupedLists = lists.filter((l) => !l.group_name);
   const groupNames = [...new Set(lists.map((l) => l.group_name).filter(Boolean))];
@@ -412,21 +414,8 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Kanban, Dashboard & Trash */}
+      {/* Dashboard & Trash */}
       <div className="border-t border-gray-100 px-3 py-2 space-y-0.5">
-        <button
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-base transition-colors ${
-            view.type === 'kanban' ? 'bg-[#15BFAE]/10 text-[#15BFAE] font-medium' : 'text-gray-700 hover:bg-gray-100'
-          }`}
-          onClick={() => setView({ type: 'kanban' })}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={view.type === 'kanban' ? '#15BFAE' : '#9ca3af'} strokeWidth="1.5">
-            <rect x="2" y="3" width="6" height="18" rx="1" />
-            <rect x="9" y="3" width="6" height="12" rx="1" />
-            <rect x="16" y="3" width="6" height="15" rx="1" />
-          </svg>
-          Kanban
-        </button>
         <button
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-base transition-colors ${
             view.type === 'stats' ? 'bg-[#15BFAE]/10 text-[#15BFAE] font-medium' : 'text-gray-700 hover:bg-gray-100'
@@ -485,7 +474,9 @@ export function Sidebar() {
             <button
               className="w-full text-left px-3 py-2 text-base text-gray-700 hover:bg-gray-50 flex items-center gap-2"
               onClick={() => {
-                setEmojiPickerListId(contextMenu.id!);
+                const list = lists.find((l) => l.Id === contextMenu.id);
+                setEmojiInputValue(list?.emoji || '');
+                setEmojiInputListId(contextMenu.id!);
                 setContextMenu(null);
               }}
             >
@@ -512,17 +503,60 @@ export function Sidebar() {
           </button>
         </div>
       )}
-      {/* Emoji picker */}
-      {emojiPickerListId && (
-        <div className="fixed inset-0 z-[60]" onClick={() => setEmojiPickerListId(null)}>
+      {/* Emoji input */}
+      {emojiInputListId && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/20" onClick={() => setEmojiInputListId(null)}>
           <div
-            className="absolute top-1/3 left-16"
+            className="bg-white rounded-lg shadow-xl border border-gray-200 p-4 w-56"
             onClick={(e) => e.stopPropagation()}
           >
-            <EmojiPicker
-              onSelect={(emoji) => updateList.mutate({ id: emojiPickerListId, emoji })}
-              onClose={() => setEmojiPickerListId(null)}
-            />
+            <p className="text-xs text-gray-500 mb-2">
+              Use <kbd className="bg-gray-100 px-1 rounded text-[10px]">Win+.</kbd> ou <kbd className="bg-gray-100 px-1 rounded text-[10px]">Cmd+Ctrl+Space</kbd>
+            </p>
+            <div className="flex items-center gap-2">
+              <input
+                ref={emojiInputRef}
+                type="text"
+                value={emojiInputValue}
+                onChange={(e) => setEmojiInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    updateList.mutate({ id: emojiInputListId, emoji: emojiInputValue.trim() });
+                    setEmojiInputListId(null);
+                    setEmojiInputValue('');
+                  }
+                  if (e.key === 'Escape') { setEmojiInputListId(null); setEmojiInputValue(''); }
+                }}
+                placeholder="😀"
+                className="flex-1 text-2xl text-center border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-[#15BFAE] w-16"
+                maxLength={4}
+              />
+              <button
+                className="px-3 py-1.5 bg-[#15BFAE] text-white text-sm rounded-md hover:bg-[#12a89a]"
+                onClick={() => {
+                  updateList.mutate({ id: emojiInputListId, emoji: emojiInputValue.trim() });
+                  setEmojiInputListId(null);
+                  setEmojiInputValue('');
+                }}
+              >
+                OK
+              </button>
+              {emojiInputValue && (
+                <button
+                  className="text-gray-400 hover:text-red-400 text-xs"
+                  onClick={() => {
+                    updateList.mutate({ id: emojiInputListId, emoji: '' });
+                    setEmojiInputListId(null);
+                    setEmojiInputValue('');
+                  }}
+                  title="Remover emoji"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}

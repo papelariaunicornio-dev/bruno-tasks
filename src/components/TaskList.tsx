@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { useAllTasks, useCreateTask, useBulkUpdatePositions } from '../hooks/useTasks';
+import { useAllTasks, useCreateTask, useUpdateTask, useBulkUpdatePositions } from '../hooks/useTasks';
 import { useTaskTags } from '../hooks/useTags';
 import { useTags } from '../hooks/useTags';
 import { useLists } from '../hooks/useLists';
@@ -42,8 +42,9 @@ export function TaskList() {
   const { data: allTagsList = [] } = useTags();
   const { data: lists = [] } = useLists();
   const createTask = useCreateTask();
+  const updateTask = useUpdateTask();
   const bulkUpdate = useBulkUpdatePositions();
-  const { view, sortBy } = useAppState();
+  const { view, sortBy, kanbanMode, toggleKanban } = useAppState();
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [showCompleted, setShowCompleted] = useState(true);
   const newTaskInputRef = useRef<HTMLInputElement>(null);
@@ -125,6 +126,120 @@ export function TaskList() {
 
   const groupByList = view.type === 'tag' || view.type === 'all' || view.type === 'in_progress' || view.type === 'priority' || view.type === 'delegated';
 
+  // Kanban columns for per-list view
+  const [kanbanDropTarget, setKanbanDropTarget] = useState<string | null>(null);
+
+  const kanbanTodo = rootTasks.filter((t) => !t.completed && !t.in_progress);
+  const kanbanDoing = rootTasks.filter((t) => !t.completed && !!t.in_progress);
+  const kanbanDone = rootTasks.filter((t) => !!t.completed);
+
+  function handleKanbanDrop(e: React.DragEvent, column: 'todo' | 'doing' | 'done') {
+    e.preventDefault();
+    setKanbanDropTarget(null);
+    const taskId = e.dataTransfer.getData('task-id');
+    if (!taskId) return;
+    const id = Number(taskId);
+    if (column === 'todo') {
+      updateTask.mutate({ id, in_progress: false, completed: false, completed_at: null });
+    } else if (column === 'doing') {
+      updateTask.mutate({ id, in_progress: true, completed: false, completed_at: null });
+    } else if (column === 'done') {
+      updateTask.mutate({ id, completed: true, in_progress: false, completed_at: new Date().toISOString() });
+    }
+  }
+
+  function renderKanbanCard(task: Task) {
+    const isCompleted = !!task.completed;
+    return (
+      <div
+        key={task.Id}
+        draggable
+        onDragStart={(e) => {
+          e.dataTransfer.setData('task-id', String(task.Id));
+          e.dataTransfer.effectAllowed = 'move';
+        }}
+        className={`bg-white rounded-lg p-3 mb-2 shadow-sm hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing border border-gray-100 ${
+          isCompleted ? 'opacity-60' : ''
+        }`}
+      >
+        <div className="flex items-start gap-2">
+          <button
+            className={`w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+              isCompleted
+                ? 'bg-[#15BFAE] border-[#15BFAE] text-white'
+                : 'border-gray-300 hover:border-[#15BFAE]'
+            }`}
+            onClick={() => updateTask.mutate({
+              id: task.Id,
+              completed: !isCompleted,
+              completed_at: !isCompleted ? new Date().toISOString() : null,
+            })}
+          >
+            {isCompleted && (
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <path d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </button>
+          <div className="flex-1 min-w-0">
+            <p className={`text-sm leading-snug ${isCompleted ? 'line-through text-gray-400' : 'text-gray-800'}`}>
+              {task.title || <span className="text-gray-300 italic">Sem titulo</span>}
+            </p>
+            <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+              {!!task.priority && (
+                <span className="text-[10px] bg-red-100 text-red-500 px-1.5 py-0.5 rounded-full font-medium">Prioridade</span>
+              )}
+              {!!task.delegated && (
+                <span className="text-[10px] bg-green-100 text-green-600 px-1.5 py-0.5 rounded-full font-medium">Delegada</span>
+              )}
+              {getSubtasks(task.Id).length > 0 && (
+                <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full">
+                  {getSubtasks(task.Id).length} sub
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderKanbanColumn(title: string, tasks: Task[], column: 'todo' | 'doing' | 'done', color: string) {
+    const isDropTarget = kanbanDropTarget === column;
+    return (
+      <div
+        className={`flex-1 min-w-0 rounded-xl flex flex-col max-h-[calc(100vh-16rem)] transition-colors ${
+          isDropTarget ? 'bg-white/25 ring-2 ring-white/40' : 'bg-white/10'
+        }`}
+        onDragOver={(e) => { e.preventDefault(); setKanbanDropTarget(column); }}
+        onDragLeave={() => setKanbanDropTarget(null)}
+        onDrop={(e) => handleKanbanDrop(e, column)}
+      >
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+          <span className={`w-2.5 h-2.5 rounded-full`} style={{ backgroundColor: color }} />
+          <h3 className="text-sm font-semibold text-white/90 flex-1">{title}</h3>
+          <span className="text-xs text-white/50 bg-white/10 rounded-full px-2 py-0.5">{tasks.length}</span>
+        </div>
+        <div className="flex-1 overflow-y-auto p-3">
+          {tasks.map(renderKanbanCard)}
+          {tasks.length === 0 && (
+            <p className="text-center text-white/30 text-xs py-6">Nenhuma tarefa</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  function renderKanbanColumns() {
+    return (
+      <div className="flex gap-3" style={{ minHeight: '300px' }}>
+        {renderKanbanColumn('A fazer', kanbanTodo, 'todo', '#9ca3af')}
+        {renderKanbanColumn('Fazendo', kanbanDoing, 'doing', '#3b82f6')}
+        {renderKanbanColumn('Feito', kanbanDone, 'done', '#22c55e')}
+      </div>
+    );
+  }
+
   function renderTaskGroup(tasks: Task[], completedList: Task[]) {
     return (
       <>
@@ -166,8 +281,26 @@ export function TaskList() {
       <div className="max-w-3xl mx-auto px-6 py-8 min-h-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-white">{viewTitle}</h1>
-          <SortMenu />
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-white">{viewTitle}</h1>
+            {view.type === 'list' && (
+              <button
+                onClick={toggleKanban}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                  kanbanMode ? 'bg-white/25 text-white' : 'bg-white/10 text-white/60 hover:text-white hover:bg-white/15'
+                }`}
+                title={kanbanMode ? 'Visualizacao em lista' : 'Visualizacao Kanban'}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <rect x="2" y="3" width="6" height="18" rx="1" />
+                  <rect x="9" y="3" width="6" height="12" rx="1" />
+                  <rect x="16" y="3" width="6" height="15" rx="1" />
+                </svg>
+                Kanban
+              </button>
+            )}
+          </div>
+          {!kanbanMode && <SortMenu />}
         </div>
 
         {/* New task input */}
@@ -190,7 +323,9 @@ export function TaskList() {
         )}
 
         {/* Tasks */}
-        {groupByList ? (
+        {kanbanMode && view.type === 'list' ? (
+          renderKanbanColumns()
+        ) : groupByList ? (
           lists.map((list) => {
             const listActive = sortedActiveTasks.filter((t) => t.list_id === list.Id);
             const listCompleted = completedTasks.filter((t) => t.list_id === list.Id);

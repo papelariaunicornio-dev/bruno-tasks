@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { TaskList } from './components/TaskList';
 import { StatsView } from './components/StatsView';
-import { KanbanView } from './components/KanbanView';
 import { CommandPalette } from './components/CommandPalette';
 import { QuickAdd } from './components/QuickAdd';
 import { Toast } from './components/Toast';
@@ -117,7 +116,7 @@ export default function App() {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col pt-14 md:pt-0 overflow-hidden" style={{ backgroundColor: '#025960' }}>
-        {view.type === 'stats' ? <StatsView /> : view.type === 'kanban' ? <KanbanView /> : <TaskList />}
+        {view.type === 'stats' ? <StatsView /> : <TaskList />}
       </div>
 
       <CommandPalette />
