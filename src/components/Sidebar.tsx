@@ -410,19 +410,6 @@ export function Sidebar() {
       {/* Pomodoro */}
       <Pomodoro />
 
-      {/* Footer */}
-      <div className="border-t border-gray-100 px-3 py-2">
-        <button
-          onClick={() => { setCreatingType('list'); }}
-          className="w-full flex items-center gap-2 px-3 py-2 text-base text-[#15BFAE] hover:bg-[#15BFAE]/5 rounded-md transition-colors"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-          Nova lista
-        </button>
-      </div>
-
       {/* Context menu */}
       {contextMenu && (
         <div

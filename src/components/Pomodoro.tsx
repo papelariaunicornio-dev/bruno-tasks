@@ -9,6 +9,7 @@ const DEFAULTS = {
 };
 
 export function Pomodoro() {
+  const [collapsed, setCollapsed] = useState(true);
   const [durations, setDurations] = useState(DEFAULTS);
   const [phase, setPhase] = useState<PomodoroPhase>('work');
   const [timeLeft, setTimeLeft] = useState(DEFAULTS.work);
@@ -94,9 +95,32 @@ export function Pomodoro() {
   const phaseColor = phase === 'work' ? '#F24B0F' : '#15BFAE';
 
   return (
-    <div className="border-t border-gray-100 px-3 py-3">
+    <div className="border-t border-gray-100 px-3 py-2">
+      {/* Header - always visible */}
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        className="w-full flex items-center gap-2 px-2 py-1.5 text-base text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5">
+          <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
+        </svg>
+        <span className="flex-1 text-left">Pomodoro</span>
+        {running && (
+          <span className="text-xs font-mono" style={{ color: phaseColor }}>
+            {String(mins).padStart(2, '0')}:{String(secs).padStart(2, '0')}
+          </span>
+        )}
+        <svg
+          width="12" height="12" viewBox="0 0 24 24" fill="#9ca3af"
+          className={`transition-transform ${collapsed ? '' : 'rotate-90'}`}
+        >
+          <path d="M8 5l8 7-8 7z" />
+        </svg>
+      </button>
+
+      {!collapsed && <>
       {/* Phase tabs */}
-      <div className="flex gap-1 mb-2">
+      <div className="flex gap-1 mb-2 mt-2">
         {(['work', 'break', 'longBreak'] as PomodoroPhase[]).map((p) => (
           <button
             key={p}
@@ -223,6 +247,7 @@ export function Pomodoro() {
           ))}
         </div>
       )}
+      </>}
     </div>
   );
 }

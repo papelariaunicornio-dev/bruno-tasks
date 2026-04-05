@@ -106,7 +106,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
           e.dataTransfer.setData('task-id', String(task.Id));
           e.dataTransfer.effectAllowed = 'move';
         }}
-        className={`group flex items-center gap-3 px-4 py-4 bg-white rounded-md mb-[2px] shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-shadow ${
+        className={`group flex items-start gap-3 px-4 py-3 bg-white rounded-md mb-[2px] shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-shadow ${
           isCompleted ? 'opacity-70' : ''
         }`}
       >
@@ -114,7 +114,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
         <button
           {...attributes}
           {...listeners}
-          className="opacity-0 group-hover:opacity-30 cursor-grab active:cursor-grabbing text-gray-400 -ml-2"
+          className="opacity-0 group-hover:opacity-30 cursor-grab active:cursor-grabbing text-gray-400 -ml-2 mt-1"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
             <circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" />
@@ -125,7 +125,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
 
         {/* Circular checkbox */}
         <button
-          className={`w-7 h-7 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+          className={`w-7 h-7 mt-1 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
             isCompleted
               ? 'bg-[#15BFAE] border-[#15BFAE] text-white'
               : 'border-gray-300 hover:border-[#15BFAE]'
@@ -140,7 +140,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
         </button>
 
         {/* Title */}
-        <div className="flex-1 min-w-0 relative">
+        <div className="flex-1 min-w-0 relative mt-1">
           {editing ? (
             <input
               ref={inputRef}
@@ -189,19 +189,19 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
 
         {/* In Progress (bookmark with play - Wunderlist style) */}
         <button
-          className="flex-shrink-0 transition-opacity hover:opacity-80"
+          className="flex-shrink-0 transition-opacity hover:opacity-80 -mt-1 -mb-1"
           onClick={() => updateTask.mutate({ id: task.Id, in_progress: !isInProgress })}
           title="Em andamento"
         >
-          <svg width="22" height="22" viewBox="0 0 24 24">
+          <svg width="24" height="36" viewBox="0 0 24 36">
             <path
-              d="M6 2h12a1 1 0 011 1v18l-6.5-4L6 21V3a1 1 0 011-1z"
+              d="M2 0h20a2 2 0 012 2v30l-12-6L0 32V2a2 2 0 012-2z"
               fill={isInProgress ? '#3b82f6' : 'none'}
               stroke={isInProgress ? '#3b82f6' : '#d1d5db'}
               strokeWidth="1.5"
             />
             <polygon
-              points="10.5,8 10.5,14 15,11"
+              points="9,10 9,20 17,15"
               fill={isInProgress ? 'white' : '#d1d5db'}
               stroke="none"
             />
@@ -210,19 +210,19 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
 
         {/* Priority (bookmark with star - Wunderlist style) */}
         <button
-          className="flex-shrink-0 transition-opacity hover:opacity-80"
+          className="flex-shrink-0 transition-opacity hover:opacity-80 -mt-1 -mb-1"
           onClick={() => updateTask.mutate({ id: task.Id, priority: !isPriority })}
           title="Importante"
         >
-          <svg width="22" height="22" viewBox="0 0 24 24">
+          <svg width="24" height="36" viewBox="0 0 24 36">
             <path
-              d="M6 2h12a1 1 0 011 1v18l-6.5-4L6 21V3a1 1 0 011-1z"
+              d="M2 0h20a2 2 0 012 2v30l-12-6L0 32V2a2 2 0 012-2z"
               fill={isPriority ? '#ef4444' : 'none'}
               stroke={isPriority ? '#ef4444' : '#d1d5db'}
               strokeWidth="1.5"
             />
             <path
-              d="M12 6.5l1.2 2.4 2.6.4-1.9 1.8.4 2.6L12 12.5l-2.3 1.2.4-2.6-1.9-1.8 2.6-.4z"
+              d="M12 7l2 4 4.5.7-3.2 3.1.8 4.5L12 17l-4.1 2.3.8-4.5-3.2-3.1 4.5-.7z"
               fill={isPriority ? 'white' : '#d1d5db'}
               stroke="none"
             />
