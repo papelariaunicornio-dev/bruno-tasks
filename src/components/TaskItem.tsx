@@ -1,6 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { useUpdateTask, useDeleteTask, useCreateTask } from '../hooks/useTasks';
 import { useTaskTags } from '../hooks/useTags';
 import { useTags } from '../hooks/useTags';
@@ -13,13 +11,15 @@ interface TaskItemProps {
   task: Task;
   depth?: number;
   subtasks: Task[];
+  onReorder?: (taskId: number, targetId: number) => void;
 }
 
-export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
+export function TaskItem({ task, depth = 0, subtasks, onReorder }: TaskItemProps) {
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(task.title);
   const [showTagSelector, setShowTagSelector] = useState(false);
   const [subtasksCollapsed, setSubtasksCollapsed] = useState(false);
+  const [dropIndicator, setDropIndicator] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const updateTask = useUpdateTask();
@@ -39,11 +39,6 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
   const isPriority = !!task.priority;
   const isInProgress = !!task.in_progress;
   const isDelegated = !!task.delegated;
-
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: task.Id,
-  });
-
 
   useEffect(() => {
     if (editingTaskId === task.Id) {
@@ -102,6 +97,23 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
           e.dataTransfer.setData('task-id', String(task.Id));
           e.dataTransfer.effectAllowed = 'move';
         }}
+        onDragOver={(e) => {
+          if (e.dataTransfer.types.includes('task-id')) {
+            e.preventDefault();
+            e.stopPropagation();
+            setDropIndicator(true);
+          }
+        }}
+        onDragLeave={() => setDropIndicator(false)}
+        onDrop={(e) => {
+          const draggedId = e.dataTransfer.getData('task-id');
+          if (draggedId && onReorder) {
+            e.preventDefault();
+            e.stopPropagation();
+            onReorder(Number(draggedId), task.Id);
+          }
+          setDropIndicator(false);
+        }}
       >
         {/* Subtask collapse toggle (outside the card) */}
         {subtasks.length > 0 ? (
@@ -119,17 +131,9 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
         )}
 
       <div
-        ref={setNodeRef}
-        style={{
-          transform: CSS.Transform.toString(transform),
-          transition,
-          opacity: isDragging ? 0.5 : 1,
-        }}
-        {...attributes}
-        {...listeners}
         className={`group relative flex-1 flex items-start gap-2 pl-2 pr-3 py-3 bg-white rounded-md shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-shadow cursor-grab active:cursor-grabbing ${
           isCompleted ? 'opacity-70' : ''
-        }`}
+        } ${dropIndicator ? 'ring-2 ring-[#15BFAE] ring-offset-1' : ''}`}
       >
         {/* Circular checkbox */}
         <button
@@ -249,7 +253,6 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
           className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600"
           onClick={() => {
             if (!task.title?.trim()) {
-              // Blank tasks: hard delete, no trash
               deleteTask.mutate(task.Id);
             } else {
               updateTask.mutate({ id: task.Id, deleted: true, deleted_at: new Date().toISOString() });
@@ -268,7 +271,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
 
       {/* Subtasks */}
       {!subtasksCollapsed && subtasks.map((sub) => (
-        <TaskItem key={sub.Id} task={sub} depth={depth + 1} subtasks={[]} />
+        <TaskItem key={sub.Id} task={sub} depth={depth + 1} subtasks={[]} onReorder={onReorder} />
       ))}
     </>
   );

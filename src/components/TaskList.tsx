@@ -1,7 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import type { DragEndEvent } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useAllTasks, useCreateTask, useUpdateTask, useBulkUpdatePositions } from '../hooks/useTasks';
 import { useTaskTags } from '../hooks/useTags';
 import { useTags } from '../hooks/useTags';
@@ -54,7 +51,6 @@ export function TaskList() {
     setTimeout(() => newTaskInputRef.current?.focus(), 100);
   }, [view]);
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   let filteredTasks: Task[];
   let viewTitle: string;
@@ -93,20 +89,20 @@ export function TaskList() {
   const rootTasks = isFilterView ? filteredTasks : filteredTasks.filter((t) => !t.parent_id);
   const pendingTasks = rootTasks.filter((t) => !t.completed);
   const completedTasks = rootTasks.filter((t) => !!t.completed);
+  const allVisible = allTasks.filter((t) => !t.deleted);
   const getSubtasks = (parentId: number) =>
-    isFilterView ? [] : sortTasks(filteredTasks.filter((t) => t.parent_id === parentId), sortBy);
+    isFilterView ? [] : sortTasks(allVisible.filter((t) => t.parent_id === parentId), sortBy);
   const sortedActiveTasks = sortTasks(pendingTasks, sortBy);
 
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    const oldIndex = sortedActiveTasks.findIndex((t) => t.Id === active.id);
-    const newIndex = sortedActiveTasks.findIndex((t) => t.Id === over.id);
+  function handleReorder(draggedId: number, targetId: number) {
+    if (draggedId === targetId) return;
+    const list = [...sortedActiveTasks];
+    const oldIndex = list.findIndex((t) => t.Id === draggedId);
+    const newIndex = list.findIndex((t) => t.Id === targetId);
     if (oldIndex === -1 || newIndex === -1) return;
-    const reordered = [...sortedActiveTasks];
-    const [moved] = reordered.splice(oldIndex, 1);
-    reordered.splice(newIndex, 0, moved);
-    const updates = reordered.map((t, i) => ({ Id: t.Id, position: i }));
+    const [moved] = list.splice(oldIndex, 1);
+    list.splice(newIndex, 0, moved);
+    const updates = list.map((t, i) => ({ Id: t.Id, position: i }));
     bulkUpdate.mutate(updates);
   }
 
@@ -245,13 +241,9 @@ export function TaskList() {
   function renderTaskGroup(tasks: Task[], completedList: Task[]) {
     return (
       <>
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={tasks.map((t) => t.Id)} strategy={verticalListSortingStrategy}>
-            {tasks.map((task) => (
-              <TaskItem key={task.Id} task={task} subtasks={getSubtasks(task.Id)} />
-            ))}
-          </SortableContext>
-        </DndContext>
+        {tasks.map((task) => (
+          <TaskItem key={task.Id} task={task} subtasks={getSubtasks(task.Id)} onReorder={handleReorder} />
+        ))}
 
         {/* Completed section */}
         {completedList.length > 0 && (
