@@ -277,7 +277,7 @@ export function Sidebar() {
               <polygon points="10.5,8 10.5,14 15,11" fill={view.type === 'in_progress' ? 'white' : '#9ca3af'} stroke="none" />
             </svg>
             Em andamento
-            <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.in_progress && !t.completed).length}</span>
+            <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.in_progress && !t.completed && !t.parent_id && !t.deleted).length}</span>
           </button>
           <button
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-base transition-colors ${
@@ -290,7 +290,7 @@ export function Sidebar() {
               <path d="M12 6.5l1.2 2.4 2.6.4-1.9 1.8.4 2.6L12 12.5l-2.3 1.2.4-2.6-1.9-1.8 2.6-.4z" fill={view.type === 'priority' ? 'white' : '#9ca3af'} stroke="none" />
             </svg>
             Prioridade
-            <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.priority && !t.completed).length}</span>
+            <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.priority && !t.completed && !t.parent_id && !t.deleted).length}</span>
           </button>
           <button
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-base transition-colors ${
@@ -304,7 +304,7 @@ export function Sidebar() {
               <path d="M7.5 16c0-2.5 2-4.5 4.5-4.5s4.5 2 4.5 4.5" fill={view.type === 'delegated' ? 'white' : '#9ca3af'} stroke="none" />
             </svg>
             Delegadas
-            <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.delegated && !t.completed).length}</span>
+            <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.delegated && !t.completed && !t.parent_id && !t.deleted).length}</span>
           </button>
         </div>
 
