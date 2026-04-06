@@ -103,37 +103,26 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
       <div
         ref={setNodeRef}
         style={style}
+        {...attributes}
+        {...listeners}
         draggable
         onDragStart={(e) => {
           e.dataTransfer.setData('task-id', String(task.Id));
           e.dataTransfer.effectAllowed = 'move';
         }}
-        className={`group relative flex items-start gap-3 px-4 py-3 bg-white rounded-md mb-[2px] shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-shadow ${
+        className={`group relative flex items-start gap-2 pl-2 pr-3 py-3 bg-white rounded-md mb-[2px] shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-shadow cursor-grab active:cursor-grabbing ${
           isCompleted ? 'opacity-70' : ''
         }`}
       >
         {/* Subtask collapse toggle (left side) */}
-        {subtasks.length > 0 ? (
+        {subtasks.length > 0 && (
           <button
-            className="flex-shrink-0 text-gray-300 hover:text-gray-500 mt-1.5 -ml-1 w-5 flex items-center justify-center"
-            onClick={() => setSubtasksCollapsed(!subtasksCollapsed)}
+            className="flex-shrink-0 text-gray-300 hover:text-gray-500 mt-1.5 w-4 flex items-center justify-center"
+            onClick={(e) => { e.stopPropagation(); setSubtasksCollapsed(!subtasksCollapsed); }}
             title={subtasksCollapsed ? 'Expandir subtarefas' : 'Recolher subtarefas'}
           >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className={`transition-transform ${subtasksCollapsed ? '' : 'rotate-90'}`}>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className={`transition-transform ${subtasksCollapsed ? '' : 'rotate-90'}`}>
               <path d="M8 5l8 7-8 7z" />
-            </svg>
-          </button>
-        ) : (
-          /* Drag handle (for dnd-kit reorder) */
-          <button
-            {...attributes}
-            {...listeners}
-            className="opacity-0 group-hover:opacity-30 cursor-grab active:cursor-grabbing text-gray-400 -ml-1 mt-1 w-5 flex items-center justify-center"
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-              <circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" />
-              <circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" />
-              <circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" />
             </svg>
           </button>
         )}
