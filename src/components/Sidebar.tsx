@@ -104,6 +104,7 @@ export function Sidebar() {
 
   function handleDragStart(e: React.DragEvent, listId: number) {
     setDraggedListId(listId);
+    e.dataTransfer.setData('list-id', String(listId));
     e.dataTransfer.effectAllowed = 'move';
   }
 
@@ -126,22 +127,59 @@ export function Sidebar() {
     }
   }
 
-  function handleTaskDropOnList(e: React.DragEvent, listId: number) {
+  function handleTaskDropOnList(e: React.DragEvent, targetListId: number) {
     const taskId = e.dataTransfer.getData('task-id');
     if (taskId) {
       e.preventDefault();
       e.stopPropagation();
       const id = Number(taskId);
       // Move parent task
-      updateTask.mutate({ id, list_id: listId });
+      updateTask.mutate({ id, list_id: targetListId });
       // Move all subtasks too
       allTasks.filter((t) => t.parent_id === id && !t.deleted).forEach((sub) => {
-        updateTask.mutate({ id: sub.Id, list_id: listId });
+        updateTask.mutate({ id: sub.Id, list_id: targetListId });
       });
       setDropTargetListId(null);
       return;
     }
-    // If not a task drop, let list drag handle it
+    // List reordering: a list dropped on another list
+    const draggedId = e.dataTransfer.getData('list-id');
+    if (draggedId && Number(draggedId) !== targetListId) {
+      e.preventDefault();
+      e.stopPropagation();
+      const fromId = Number(draggedId);
+      // Get lists in same group as the target
+      const targetList = lists.find((l) => l.Id === targetListId);
+      const fromList = lists.find((l) => l.Id === fromId);
+      if (targetList && fromList) {
+        // Move to same group if different
+        if (fromList.group_name !== targetList.group_name) {
+          updateList.mutate({ id: fromId, group_name: targetList.group_name });
+        }
+        // Reorder: get all lists in target's group, reorder
+        const groupLists = lists
+          .filter((l) => l.group_name === targetList.group_name)
+          .sort((a, b) => a.position - b.position);
+        const oldIdx = groupLists.findIndex((l) => l.Id === fromId);
+        const newIdx = groupLists.findIndex((l) => l.Id === targetListId);
+        if (oldIdx !== -1 && newIdx !== -1) {
+          const reordered = [...groupLists];
+          const [moved] = reordered.splice(oldIdx, 1);
+          reordered.splice(newIdx, 0, moved);
+          reordered.forEach((l, i) => updateList.mutate({ id: l.Id, position: i }));
+        } else if (oldIdx === -1) {
+          // From different group, insert at target position
+          const reordered = [...groupLists];
+          const insertIdx = reordered.findIndex((l) => l.Id === targetListId);
+          reordered.splice(insertIdx, 0, fromList);
+          reordered.forEach((l, i) => updateList.mutate({ id: l.Id, position: i }));
+        }
+      }
+      setDraggedListId(null);
+      setDropTargetListId(null);
+      return;
+    }
+    // Fallback
     handleDropOnUngrouped(e);
   }
 
@@ -156,7 +194,7 @@ export function Sidebar() {
         key={list.Id}
         className="group"
         onDragOver={(e) => {
-          if (e.dataTransfer.types.includes('task-id') || e.dataTransfer.types.includes('text/plain')) {
+          if (e.dataTransfer.types.includes('task-id') || e.dataTransfer.types.includes('list-id') || e.dataTransfer.types.includes('text/plain')) {
             e.preventDefault();
             e.stopPropagation();
             setDropTargetListId(list.Id);
