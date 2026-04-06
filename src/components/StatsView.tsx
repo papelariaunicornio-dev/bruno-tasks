@@ -202,7 +202,7 @@ export function StatsView() {
         </div>
 
         {/* Daily Chart */}
-        {days.length > 1 && (
+        {days.length >= 1 && (
           <div className="bg-white rounded-lg p-5 shadow-sm mb-6">
             <h2 className="text-sm font-semibold text-gray-700 mb-4">
               Criadas vs concluidas ({formatDate(start)} - {formatDate(end)})
