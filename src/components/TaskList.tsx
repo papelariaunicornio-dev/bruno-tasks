@@ -88,11 +88,13 @@ export function TaskList() {
     viewTitle = 'Todas as tarefas';
   }
 
-  const rootTasks = filteredTasks.filter((t) => !t.parent_id);
+  const isFilterView = view.type === 'in_progress' || view.type === 'priority' || view.type === 'delegated';
+  // In filter views, show all matched tasks as flat list (including subtasks)
+  const rootTasks = isFilterView ? filteredTasks : filteredTasks.filter((t) => !t.parent_id);
   const pendingTasks = rootTasks.filter((t) => !t.completed);
   const completedTasks = rootTasks.filter((t) => !!t.completed);
   const getSubtasks = (parentId: number) =>
-    sortTasks(filteredTasks.filter((t) => t.parent_id === parentId), sortBy);
+    isFilterView ? [] : sortTasks(filteredTasks.filter((t) => t.parent_id === parentId), sortBy);
   const sortedActiveTasks = sortTasks(pendingTasks, sortBy);
 
   function handleDragEnd(event: DragEndEvent) {
