@@ -131,7 +131,13 @@ export function Sidebar() {
     if (taskId) {
       e.preventDefault();
       e.stopPropagation();
-      updateTask.mutate({ id: Number(taskId), list_id: listId });
+      const id = Number(taskId);
+      // Move parent task
+      updateTask.mutate({ id, list_id: listId });
+      // Move all subtasks too
+      allTasks.filter((t) => t.parent_id === id && !t.deleted).forEach((sub) => {
+        updateTask.mutate({ id: sub.Id, list_id: listId });
+      });
       setDropTargetListId(null);
       return;
     }
