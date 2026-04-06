@@ -96,20 +96,85 @@ export function Pomodoro({ iconOnly = false }: { iconOnly?: boolean }) {
 
   if (iconOnly) {
     return (
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className={`w-10 h-10 flex items-center justify-center rounded-md transition-colors relative ${
-          running ? 'text-[#F24B0F]' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-        }`}
-        title={running ? `Pomodoro ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}` : 'Pomodoro'}
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
-        </svg>
-        {running && (
-          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#F24B0F] rounded-full" />
+      <div className="relative">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className={`w-10 h-10 flex items-center justify-center rounded-md transition-colors relative ${
+            running ? 'text-[#F24B0F]' : collapsed ? 'text-gray-400 hover:text-gray-600 hover:bg-gray-100' : 'bg-gray-100 text-gray-700'
+          }`}
+          title={running ? `Pomodoro ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}` : 'Pomodoro'}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
+          </svg>
+          {running && (
+            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#F24B0F] rounded-full" />
+          )}
+        </button>
+        {!collapsed && (
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 bg-white rounded-lg shadow-xl border border-gray-200 p-3 z-50">
+            {/* Phase tabs */}
+            <div className="flex gap-1 mb-2">
+              {(['work', 'break', 'longBreak'] as PomodoroPhase[]).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => switchPhase(p)}
+                  className={`flex-1 text-[10px] py-1 rounded transition-colors ${
+                    phase === p ? 'bg-gray-100 text-gray-700 font-medium' : 'text-gray-400 hover:text-gray-600'
+                  }`}
+                >
+                  {p === 'work' ? 'Foco' : p === 'break' ? 'Pausa' : 'Longa'}
+                </button>
+              ))}
+            </div>
+            {/* Timer */}
+            <div className="flex flex-col items-center py-1">
+              <svg width="80" height="80" className="mb-1">
+                <circle cx="40" cy="40" r="34" fill="none" stroke="#f3f4f6" strokeWidth="4" />
+                <circle
+                  cx="40" cy="40" r="34"
+                  fill="none" stroke={phaseColor} strokeWidth="4" strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 34}`}
+                  strokeDashoffset={`${2 * Math.PI * 34 * (1 - progress)}`}
+                  transform="rotate(-90 40 40)"
+                  className="transition-all duration-1000"
+                />
+                <text x="40" y="38" textAnchor="middle" dominantBaseline="middle" fill="#1f2937" fontSize="18" fontWeight="600" fontFamily="monospace">
+                  {String(mins).padStart(2, '0')}:{String(secs).padStart(2, '0')}
+                </text>
+                <text x="40" y="52" textAnchor="middle" fill={phaseColor} fontSize="7" fontWeight="500">
+                  {phaseLabel}
+                </text>
+              </svg>
+              <div className="flex items-center gap-2 mt-1">
+                <button
+                  onClick={() => setRunning(!running)}
+                  className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+                  style={{ backgroundColor: phaseColor + '22', color: phaseColor }}
+                >
+                  {running ? (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <rect x="6" y="4" width="4" height="16" rx="1" /><rect x="14" y="4" width="4" height="16" rx="1" />
+                    </svg>
+                  ) : (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                  )}
+                </button>
+                <button onClick={reset} className="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100" title="Resetar">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M1 4v6h6M23 20v-6h-6" /><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15" />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex gap-1 mt-2">
+                {[0, 1, 2, 3].map((i) => (
+                  <span key={i} className="w-2 h-2 rounded-full transition-colors" style={{ backgroundColor: i < (sessions % 4) ? phaseColor : '#e5e7eb' }} />
+                ))}
+              </div>
+            </div>
+          </div>
         )}
-      </button>
+      </div>
     );
   }
 
