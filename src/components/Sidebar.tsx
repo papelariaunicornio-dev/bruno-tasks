@@ -200,121 +200,117 @@ export function Sidebar() {
 
   return (
     <aside className="w-full bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0">
-      {/* Header */}
-      <div className="px-4 pt-5 pb-3 flex items-center justify-between">
-        <h1 className="text-lg font-bold text-gray-800 tracking-tight">Bruno Tasks</h1>
-        <div ref={addMenuRef} className="relative">
-          <button
-            className="w-7 h-7 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-            onClick={() => setShowAddMenu(!showAddMenu)}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-          </button>
-          {showAddMenu && (
-            <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-              <button
-                className="w-full text-left px-3 py-2 text-base text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                onClick={() => { setCreatingType('list'); setShowAddMenu(false); }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#15BFAE" strokeWidth="2">
-                  <path d="M3 7h18M3 12h18M3 17h18" />
-                </svg>
-                Nova lista
-              </button>
-              <button
-                className="w-full text-left px-3 py-2 text-base text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                onClick={() => { setCreatingType('group'); setShowAddMenu(false); }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
-                  <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
-                </svg>
-                Novo grupo
-              </button>
-            </div>
-          )}
+      {/* Fixed top: Header + Search + Todas */}
+      <div className="flex-shrink-0">
+        {/* Header */}
+        <div className="px-4 pt-5 pb-3 flex items-center justify-between">
+          <h1 className="text-lg font-bold text-gray-800 tracking-tight">Bruno Tasks</h1>
+          <div ref={addMenuRef} className="relative">
+            <button
+              className="w-7 h-7 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+              onClick={() => setShowAddMenu(!showAddMenu)}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+            </button>
+            {showAddMenu && (
+              <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                <button
+                  className="w-full text-left px-3 py-2 text-base text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                  onClick={() => { setCreatingType('list'); setShowAddMenu(false); }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#15BFAE" strokeWidth="2">
+                    <path d="M3 7h18M3 12h18M3 17h18" />
+                  </svg>
+                  Nova lista
+                </button>
+                <button
+                  className="w-full text-left px-3 py-2 text-base text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                  onClick={() => { setCreatingType('group'); setShowAddMenu(false); }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
+                    <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
+                  </svg>
+                  Novo grupo
+                </button>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Todas */}
+        <div className="px-3 mb-1">
+          <button
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-base transition-colors ${
+              view.type === 'all' ? 'bg-[#15BFAE]/10 text-[#15BFAE] font-medium' : 'text-gray-700 hover:bg-gray-100'
+            }`}
+            onClick={() => setView({ type: 'all' })}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={view.type === 'all' ? '#15BFAE' : '#9ca3af'} strokeWidth="1.5">
+              <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
+            </svg>
+            Todas
+            <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !t.parent_id && !t.completed).length}</span>
+          </button>
+        </div>
+
+        <div className="border-b border-gray-100 mx-3" />
       </div>
 
-      {/* Search hint */}
-      <div className="px-3 mb-2">
-        <button
-          onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }))}
-          className="w-full flex items-center gap-2 px-3 py-2 text-base text-gray-400 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
-          </svg>
-          Pesquisar
-          <kbd className="ml-auto text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded">Ctrl+K</kbd>
-        </button>
-      </div>
-
-      {/* Built-in views */}
-      <div className="px-3 mb-1 space-y-0.5">
-        <button
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-base transition-colors ${
-            view.type === 'all' ? 'bg-[#15BFAE]/10 text-[#15BFAE] font-medium' : 'text-gray-700 hover:bg-gray-100'
-          }`}
-          onClick={() => setView({ type: 'all' })}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={view.type === 'all' ? '#15BFAE' : '#9ca3af'} strokeWidth="1.5">
-            <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
-          </svg>
-          Todas
-          <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !t.parent_id && !t.completed).length}</span>
-        </button>
-        <button
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-base transition-colors ${
-            view.type === 'in_progress' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-100'
-          }`}
-          onClick={() => setView({ type: 'in_progress' })}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24">
-            <path d="M6 2h12a1 1 0 011 1v18l-6.5-4L6 21V3a1 1 0 011-1z" fill={view.type === 'in_progress' ? '#3b82f6' : 'none'} stroke={view.type === 'in_progress' ? '#3b82f6' : '#9ca3af'} strokeWidth="1.5" />
-            <polygon points="10.5,8 10.5,14 15,11" fill={view.type === 'in_progress' ? 'white' : '#9ca3af'} stroke="none" />
-          </svg>
-          Em andamento
-          <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.in_progress && !t.completed).length}</span>
-        </button>
-        <button
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-base transition-colors ${
-            view.type === 'priority' ? 'bg-red-50 text-red-500 font-medium' : 'text-gray-700 hover:bg-gray-100'
-          }`}
-          onClick={() => setView({ type: 'priority' })}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24">
-            <path d="M6 2h12a1 1 0 011 1v18l-6.5-4L6 21V3a1 1 0 011-1z" fill={view.type === 'priority' ? '#ef4444' : 'none'} stroke={view.type === 'priority' ? '#ef4444' : '#9ca3af'} strokeWidth="1.5" />
-            <path d="M12 6.5l1.2 2.4 2.6.4-1.9 1.8.4 2.6L12 12.5l-2.3 1.2.4-2.6-1.9-1.8 2.6-.4z" fill={view.type === 'priority' ? 'white' : '#9ca3af'} stroke="none" />
-          </svg>
-          Prioridade
-          <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.priority && !t.completed).length}</span>
-        </button>
-        <button
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-base transition-colors ${
-            view.type === 'delegated' ? 'bg-green-50 text-green-600 font-medium' : 'text-gray-700 hover:bg-gray-100'
-          }`}
-          onClick={() => setView({ type: 'delegated' })}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24">
-            <path d="M6 2h12a1 1 0 011 1v18l-6.5-4L6 21V3a1 1 0 011-1z" fill={view.type === 'delegated' ? '#22c55e' : 'none'} stroke={view.type === 'delegated' ? '#22c55e' : '#9ca3af'} strokeWidth="1.5" />
-            <circle cx="12" cy="8.5" r="2.5" fill={view.type === 'delegated' ? 'white' : '#9ca3af'} stroke="none" />
-            <path d="M7.5 16c0-2.5 2-4.5 4.5-4.5s4.5 2 4.5 4.5" fill={view.type === 'delegated' ? 'white' : '#9ca3af'} stroke="none" />
-          </svg>
-          Delegadas
-          <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.delegated && !t.completed).length}</span>
-        </button>
-      </div>
-
-      <div className="border-b border-gray-100 mx-3 my-1" />
-
-      {/* Lists & Groups */}
+      {/* Scrollable area: filters, lists, groups, tags */}
       <div
         className="flex-1 overflow-y-auto px-3 pt-1"
         onDragOver={(e) => { e.preventDefault(); setDropTargetGroup('__ungrouped__'); }}
         onDrop={handleDropOnUngrouped}
       >
+        {/* Built-in filter views */}
+        <div className="space-y-0.5 mb-1">
+          <button
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-base transition-colors ${
+              view.type === 'in_progress' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-100'
+            }`}
+            onClick={() => setView({ type: 'in_progress' })}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path d="M6 2h12a1 1 0 011 1v18l-6.5-4L6 21V3a1 1 0 011-1z" fill={view.type === 'in_progress' ? '#3b82f6' : 'none'} stroke={view.type === 'in_progress' ? '#3b82f6' : '#9ca3af'} strokeWidth="1.5" />
+              <polygon points="10.5,8 10.5,14 15,11" fill={view.type === 'in_progress' ? 'white' : '#9ca3af'} stroke="none" />
+            </svg>
+            Em andamento
+            <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.in_progress && !t.completed).length}</span>
+          </button>
+          <button
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-base transition-colors ${
+              view.type === 'priority' ? 'bg-red-50 text-red-500 font-medium' : 'text-gray-700 hover:bg-gray-100'
+            }`}
+            onClick={() => setView({ type: 'priority' })}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path d="M6 2h12a1 1 0 011 1v18l-6.5-4L6 21V3a1 1 0 011-1z" fill={view.type === 'priority' ? '#ef4444' : 'none'} stroke={view.type === 'priority' ? '#ef4444' : '#9ca3af'} strokeWidth="1.5" />
+              <path d="M12 6.5l1.2 2.4 2.6.4-1.9 1.8.4 2.6L12 12.5l-2.3 1.2.4-2.6-1.9-1.8 2.6-.4z" fill={view.type === 'priority' ? 'white' : '#9ca3af'} stroke="none" />
+            </svg>
+            Prioridade
+            <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.priority && !t.completed).length}</span>
+          </button>
+          <button
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-base transition-colors ${
+              view.type === 'delegated' ? 'bg-green-50 text-green-600 font-medium' : 'text-gray-700 hover:bg-gray-100'
+            }`}
+            onClick={() => setView({ type: 'delegated' })}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path d="M6 2h12a1 1 0 011 1v18l-6.5-4L6 21V3a1 1 0 011-1z" fill={view.type === 'delegated' ? '#22c55e' : 'none'} stroke={view.type === 'delegated' ? '#22c55e' : '#9ca3af'} strokeWidth="1.5" />
+              <circle cx="12" cy="8.5" r="2.5" fill={view.type === 'delegated' ? 'white' : '#9ca3af'} stroke="none" />
+              <path d="M7.5 16c0-2.5 2-4.5 4.5-4.5s4.5 2 4.5 4.5" fill={view.type === 'delegated' ? 'white' : '#9ca3af'} stroke="none" />
+            </svg>
+            Delegadas
+            <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.delegated && !t.completed).length}</span>
+          </button>
+        </div>
+
+        <div className="border-b border-gray-100 my-1" />
+
+        {/* Lists & Groups */}
         {creatingType && (
           <div className="py-2">
             <input
@@ -383,12 +379,10 @@ export function Sidebar() {
             </div>
           );
         })}
-      </div>
 
-      {/* Tags section */}
-      <div className="border-t border-gray-100 px-3 py-2">
-        <p className="px-3 py-1 text-xs font-semibold text-gray-400 mb-1">Tags</p>
-        <div className="max-h-32 overflow-y-auto">
+        {/* Tags section (inside scroll) */}
+        <div className="border-t border-gray-100 mt-2 pt-2">
+          <p className="px-3 py-1 text-xs font-semibold text-gray-400 mb-1">Tags</p>
           {tags.map((tag) => (
             <div key={tag.Id} className="group flex items-center">
               <button
@@ -414,35 +408,46 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Dashboard & Trash */}
-      <div className="border-t border-gray-100 px-3 py-2 space-y-0.5">
+      {/* Fixed bottom: icon-only bar */}
+      <div className="flex-shrink-0 border-t border-gray-100 px-3 py-2 flex items-center justify-center gap-1">
         <button
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-base transition-colors ${
-            view.type === 'stats' ? 'bg-[#15BFAE]/10 text-[#15BFAE] font-medium' : 'text-gray-700 hover:bg-gray-100'
+          className="w-10 h-10 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+          onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }))}
+          title="Pesquisar (Ctrl+K)"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
+          </svg>
+        </button>
+        <button
+          className={`w-10 h-10 flex items-center justify-center rounded-md transition-colors ${
+            view.type === 'stats' ? 'bg-[#15BFAE]/10 text-[#15BFAE]' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
           }`}
           onClick={() => setView({ type: 'stats' })}
+          title="Dashboard"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={view.type === 'stats' ? '#15BFAE' : '#9ca3af'} strokeWidth="1.5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path d="M18 20V10M12 20V4M6 20v-6" />
           </svg>
-          Dashboard
         </button>
         <button
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-base transition-colors ${
-            view.type === 'trash' ? 'bg-gray-100 text-gray-700 font-medium' : 'text-gray-500 hover:bg-gray-100'
+          className={`w-10 h-10 flex items-center justify-center rounded-md transition-colors relative ${
+            view.type === 'trash' ? 'bg-gray-100 text-gray-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
           }`}
           onClick={() => setView({ type: 'trash' })}
+          title="Lixeira"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={view.type === 'trash' ? '#6b7280' : '#9ca3af'} strokeWidth="1.5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" />
           </svg>
-          Lixeira
-          <span className="ml-auto text-xs text-gray-400">{allTasks.filter((t) => !!t.deleted).length}</span>
+          {allTasks.filter((t) => !!t.deleted).length > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] rounded-full flex items-center justify-center">
+              {allTasks.filter((t) => !!t.deleted).length}
+            </span>
+          )}
         </button>
+        <Pomodoro iconOnly />
       </div>
-
-      {/* Pomodoro */}
-      <Pomodoro />
 
       {/* Context menu */}
       {contextMenu && (

@@ -8,7 +8,7 @@ const DEFAULTS = {
   longBreak: 15 * 60,
 };
 
-export function Pomodoro() {
+export function Pomodoro({ iconOnly = false }: { iconOnly?: boolean }) {
   const [collapsed, setCollapsed] = useState(true);
   const [durations, setDurations] = useState(DEFAULTS);
   const [phase, setPhase] = useState<PomodoroPhase>('work');
@@ -93,6 +93,25 @@ export function Pomodoro() {
 
   const phaseLabel = phase === 'work' ? 'Foco' : phase === 'break' ? 'Pausa' : 'Pausa longa';
   const phaseColor = phase === 'work' ? '#F24B0F' : '#15BFAE';
+
+  if (iconOnly) {
+    return (
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        className={`w-10 h-10 flex items-center justify-center rounded-md transition-colors relative ${
+          running ? 'text-[#F24B0F]' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+        }`}
+        title={running ? `Pomodoro ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}` : 'Pomodoro'}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
+        </svg>
+        {running && (
+          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#F24B0F] rounded-full" />
+        )}
+      </button>
+    );
+  }
 
   return (
     <div className="border-t border-gray-100 px-3 py-2">
