@@ -94,7 +94,15 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
 
   return (
     <>
-      <div style={{ marginLeft: `${depth * 24}px` }} className="flex items-start mb-[2px]">
+      <div
+        style={{ marginLeft: `${depth * 24}px` }}
+        className="flex items-start mb-[2px]"
+        draggable
+        onDragStart={(e) => {
+          e.dataTransfer.setData('task-id', String(task.Id));
+          e.dataTransfer.effectAllowed = 'move';
+        }}
+      >
         {/* Subtask collapse toggle (outside the card) */}
         {subtasks.length > 0 ? (
           <button
@@ -119,11 +127,6 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
         }}
         {...attributes}
         {...listeners}
-        draggable
-        onDragStart={(e) => {
-          e.dataTransfer.setData('task-id', String(task.Id));
-          e.dataTransfer.effectAllowed = 'move';
-        }}
         className={`group relative flex-1 flex items-start gap-2 pl-2 pr-3 py-3 bg-white rounded-md shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-shadow cursor-grab active:cursor-grabbing ${
           isCompleted ? 'opacity-70' : ''
         }`}
