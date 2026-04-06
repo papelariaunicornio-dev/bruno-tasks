@@ -44,12 +44,6 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
     id: task.Id,
   });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-    marginLeft: `${depth * 24}px`,
-  };
 
   useEffect(() => {
     if (editingTaskId === task.Id) {
@@ -100,9 +94,29 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
 
   return (
     <>
+      <div style={{ marginLeft: `${depth * 24}px` }} className="flex items-start mb-[2px]">
+        {/* Subtask collapse toggle (outside the card) */}
+        {subtasks.length > 0 ? (
+          <button
+            className="flex-shrink-0 text-gray-400 hover:text-white mt-3.5 w-5 flex items-center justify-center"
+            onClick={() => setSubtasksCollapsed(!subtasksCollapsed)}
+            title={subtasksCollapsed ? 'Expandir subtarefas' : 'Recolher subtarefas'}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${subtasksCollapsed ? '' : 'rotate-90'}`}>
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </button>
+        ) : (
+          <span className="w-5 flex-shrink-0" />
+        )}
+
       <div
         ref={setNodeRef}
-        style={style}
+        style={{
+          transform: CSS.Transform.toString(transform),
+          transition,
+          opacity: isDragging ? 0.5 : 1,
+        }}
         {...attributes}
         {...listeners}
         draggable
@@ -110,23 +124,10 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
           e.dataTransfer.setData('task-id', String(task.Id));
           e.dataTransfer.effectAllowed = 'move';
         }}
-        className={`group relative flex items-start gap-2 pl-2 pr-3 py-3 bg-white rounded-md mb-[2px] shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-shadow cursor-grab active:cursor-grabbing ${
+        className={`group relative flex-1 flex items-start gap-2 pl-2 pr-3 py-3 bg-white rounded-md shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-shadow cursor-grab active:cursor-grabbing ${
           isCompleted ? 'opacity-70' : ''
         }`}
       >
-        {/* Subtask collapse toggle (left side) */}
-        {subtasks.length > 0 && (
-          <button
-            className="flex-shrink-0 text-gray-300 hover:text-gray-500 mt-1.5 w-4 flex items-center justify-center"
-            onClick={(e) => { e.stopPropagation(); setSubtasksCollapsed(!subtasksCollapsed); }}
-            title={subtasksCollapsed ? 'Expandir subtarefas' : 'Recolher subtarefas'}
-          >
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className={`transition-transform ${subtasksCollapsed ? '' : 'rotate-90'}`}>
-              <path d="M8 5l8 7-8 7z" />
-            </svg>
-          </button>
-        )}
-
         {/* Circular checkbox */}
         <button
           className={`w-7 h-7 mt-1 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
@@ -260,6 +261,7 @@ export function TaskItem({ task, depth = 0, subtasks }: TaskItemProps) {
           </svg>
         </button>
       </div>
+      </div>{/* end outer flex */}
 
       {/* Subtasks */}
       {!subtasksCollapsed && subtasks.map((sub) => (
