@@ -118,11 +118,11 @@ export function TaskItem({ task, depth = 0, subtasks, onReorder }: TaskItemProps
         {/* Subtask collapse toggle (outside the card) */}
         {subtasks.length > 0 ? (
           <button
-            className="flex-shrink-0 text-gray-400 hover:text-white mt-3.5 w-5 flex items-center justify-center"
+            className="flex-shrink-0 text-gray-400 hover:text-white w-5 self-center flex items-center justify-center"
             onClick={() => setSubtasksCollapsed(!subtasksCollapsed)}
             title={subtasksCollapsed ? 'Expandir subtarefas' : 'Recolher subtarefas'}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${subtasksCollapsed ? '' : 'rotate-90'}`}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${subtasksCollapsed ? '' : 'rotate-90'}`}>
               <path d="M9 6l6 6-6 6" />
             </svg>
           </button>
