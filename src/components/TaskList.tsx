@@ -120,7 +120,11 @@ export function TaskList() {
       const inbox = lists.find((l) => l.title === 'Inbox');
       const listId = view.type === 'list' ? view.listId : inbox?.Id || lists[0]?.Id;
       if (!listId) return;
-      createTask.mutate({ title: newTaskTitle.trim(), list_id: listId });
+      const extra: Partial<Task> = {};
+      if (view.type === 'in_progress') extra.in_progress = true;
+      if (view.type === 'priority') extra.priority = true;
+      if (view.type === 'delegated') extra.delegated = true;
+      createTask.mutate({ title: newTaskTitle.trim(), list_id: listId, ...extra });
       setNewTaskTitle('');
       // Keep focus on the input for sequential task creation
       newTaskInputRef.current?.focus();
