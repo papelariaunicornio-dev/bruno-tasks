@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { marked } from 'marked';
 import { useUpdateTask, useDeleteTask, useCreateTask } from '../hooks/useTasks';
 import { useTaskTags } from '../hooks/useTags';
 import { useTags } from '../hooks/useTags';
@@ -6,6 +7,8 @@ import { useAppState } from '../store/appState';
 import { TagBadge } from './TagBadge';
 import { TagSelector } from './TagSelector';
 import type { Task } from '../types';
+
+marked.setOptions({ breaks: true, gfm: true });
 
 interface TaskItemProps {
   task: Task;
@@ -20,7 +23,13 @@ export function TaskItem({ task, depth = 0, subtasks, onReorder }: TaskItemProps
   const [showTagSelector, setShowTagSelector] = useState(false);
   const [subtasksCollapsed, setSubtasksCollapsed] = useState(false);
   const [dropIndicator, setDropIndicator] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [noteEditing, setNoteEditing] = useState(false);
+  const [noteValue, setNoteValue] = useState(task.description ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
+  const noteRef = useRef<HTMLTextAreaElement>(null);
+
+  const hasNote = !!(task.description && task.description.trim());
 
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
@@ -47,6 +56,27 @@ export function TaskItem({ task, depth = 0, subtasks, onReorder }: TaskItemProps
       setEditingTaskId(null);
     }
   }, [editingTaskId, task.Id, task.title, setEditingTaskId]);
+
+  useEffect(() => {
+    setNoteValue(task.description ?? '');
+  }, [task.description]);
+
+  useEffect(() => {
+    if (noteEditing && noteRef.current) {
+      noteRef.current.focus();
+      // Auto-grow
+      noteRef.current.style.height = 'auto';
+      noteRef.current.style.height = noteRef.current.scrollHeight + 'px';
+    }
+  }, [noteEditing]);
+
+  function handleSaveNote() {
+    const trimmed = noteValue.trim();
+    if (trimmed !== (task.description ?? '').trim()) {
+      updateTask.mutate({ id: task.Id, description: trimmed });
+    }
+    setNoteEditing(false);
+  }
 
   useEffect(() => {
     if (!editing) return;
@@ -211,14 +241,31 @@ export function TaskItem({ task, depth = 0, subtasks, onReorder }: TaskItemProps
           ))}
         </div>
 
-        {/* Tag button */}
-        <button
-          className="opacity-0 group-hover:opacity-30 hover:!opacity-100 text-gray-400 text-xs"
-          onClick={() => setShowTagSelector(!showTagSelector)}
-          title="Tags (Tab)"
-        >
-          #
-        </button>
+        {/* Tag + Note buttons (vertical stack) */}
+        <div className="flex flex-col items-center gap-1 flex-shrink-0">
+          <button
+            className="opacity-0 group-hover:opacity-30 hover:!opacity-100 text-gray-400 text-xs leading-none"
+            onClick={() => setShowTagSelector(!showTagSelector)}
+            title="Tags (Tab)"
+          >
+            #
+          </button>
+          <button
+            className={`leading-none transition-opacity ${
+              hasNote
+                ? 'opacity-70 hover:opacity-100 text-[#15BFAE]'
+                : 'opacity-0 group-hover:opacity-30 hover:!opacity-100 text-gray-400'
+            }`}
+            onClick={() => { setNoteOpen(!noteOpen); if (!noteOpen && !hasNote) setNoteEditing(true); }}
+            title={hasNote ? 'Ver nota' : 'Adicionar nota'}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <path d="M14 2v6h6" />
+              <path d="M8 13h8M8 17h6" />
+            </svg>
+          </button>
+        </div>
 
         {/* Flags group: delegada, em andamento, prioridade */}
         <div className="flex gap-0.5 flex-shrink-0">
@@ -289,6 +336,69 @@ export function TaskItem({ task, depth = 0, subtasks, onReorder }: TaskItemProps
         </button>
       </div>
       </div>{/* end outer flex */}
+
+      {/* Note panel */}
+      {noteOpen && (
+        <div
+          style={{ marginLeft: `${depth * 24 + 20}px` }}
+          className="bg-white rounded-md mb-[2px] p-3 shadow-[0_1px_2px_rgba(0,0,0,0.06)] border-l-4 border-[#15BFAE]"
+        >
+          {noteEditing ? (
+            <div>
+              <textarea
+                ref={noteRef}
+                value={noteValue}
+                onChange={(e) => {
+                  setNoteValue(e.target.value);
+                  e.target.style.height = 'auto';
+                  e.target.style.height = e.target.scrollHeight + 'px';
+                }}
+                onBlur={handleSaveNote}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    setNoteValue(task.description ?? '');
+                    setNoteEditing(false);
+                  }
+                  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                    e.preventDefault();
+                    handleSaveNote();
+                  }
+                }}
+                placeholder="Escreva sua nota em markdown... (Ctrl+Enter para salvar, Esc para cancelar)"
+                className="w-full bg-transparent text-sm outline-none resize-none text-gray-800 font-mono leading-relaxed min-h-[60px]"
+              />
+              <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
+                <span className="text-[10px] text-gray-400">Markdown suportado</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => { setNoteValue(task.description ?? ''); setNoteEditing(false); }}
+                    className="text-xs text-gray-500 hover:text-gray-700"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleSaveNote}
+                    className="text-xs bg-[#15BFAE] text-white px-3 py-1 rounded hover:bg-[#12a89a]"
+                  >
+                    Salvar
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div onClick={() => setNoteEditing(true)} className="cursor-text">
+              {hasNote ? (
+                <div
+                  className="prose prose-sm max-w-none text-gray-700 markdown-note"
+                  dangerouslySetInnerHTML={{ __html: marked.parse(task.description) as string }}
+                />
+              ) : (
+                <p className="text-sm text-gray-300 italic">Clique para adicionar uma nota...</p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Subtasks */}
       {!subtasksCollapsed && subtasks.map((sub) => (
