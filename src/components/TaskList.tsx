@@ -88,13 +88,19 @@ export function TaskList() {
   }
 
   const isFilterView = view.type === 'in_progress' || view.type === 'priority' || view.type === 'delegated';
-  // In filter views, show all matched tasks as flat list (including subtasks)
-  const rootTasks = isFilterView ? filteredTasks : filteredTasks.filter((t) => !t.parent_id);
+  const filteredIds = new Set(filteredTasks.map((t) => t.Id));
+  // In filter views, a task is "root" if it has no parent OR its parent is NOT in the filter set
+  // (so subtasks render nested under their parent when the parent is also in the set)
+  const rootTasks = isFilterView
+    ? filteredTasks.filter((t) => !t.parent_id || !filteredIds.has(t.parent_id))
+    : filteredTasks.filter((t) => !t.parent_id);
   const pendingTasks = rootTasks.filter((t) => !t.completed);
   const completedTasks = rootTasks.filter((t) => !!t.completed);
   const allVisible = allTasks.filter((t) => !t.deleted);
   const getSubtasks = (parentId: number) =>
-    isFilterView ? [] : sortTasks(allVisible.filter((t) => t.parent_id === parentId), sortBy);
+    isFilterView
+      ? sortTasks(filteredTasks.filter((t) => t.parent_id === parentId), sortBy)
+      : sortTasks(allVisible.filter((t) => t.parent_id === parentId), sortBy);
   const sortedActiveTasks = sortTasks(pendingTasks, sortBy);
 
   function handleReorder(draggedId: number, targetId: number) {
