@@ -67,15 +67,18 @@ export function TaskList() {
     filteredTasks = visibleTasks.filter((t) => tagTaskIds.includes(t.Id));
     const tag = allTagsList.find((t) => t.Id === view.tagId);
     viewTitle = tag?.name ?? '';
-  } else if (view.type === 'in_progress') {
-    filteredTasks = visibleTasks.filter((t) => !!t.in_progress);
-    viewTitle = 'Em andamento';
-  } else if (view.type === 'priority') {
-    filteredTasks = visibleTasks.filter((t) => !!t.priority);
-    viewTitle = 'Prioridade';
-  } else if (view.type === 'delegated') {
-    filteredTasks = visibleTasks.filter((t) => !!t.delegated);
-    viewTitle = 'Delegadas';
+  } else if (view.type === 'in_progress' || view.type === 'priority' || view.type === 'delegated') {
+    const flagField = view.type === 'in_progress' ? 'in_progress'
+      : view.type === 'priority' ? 'priority' : 'delegated';
+    const matched = visibleTasks.filter((t) => !!t[flagField]);
+    const matchedIds = new Set(matched.map((t) => t.Id));
+    // Include subtasks whose parent has the flag (even if subtask doesn't)
+    const subtasksOfMatched = visibleTasks.filter(
+      (t) => t.parent_id != null && matchedIds.has(t.parent_id) && !matchedIds.has(t.Id)
+    );
+    filteredTasks = [...matched, ...subtasksOfMatched];
+    viewTitle = view.type === 'in_progress' ? 'Em andamento'
+      : view.type === 'priority' ? 'Prioridade' : 'Delegadas';
   } else if (view.type === 'trash') {
     filteredTasks = visibleTasks;
     viewTitle = 'Lixeira';
