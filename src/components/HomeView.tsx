@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAllTasks } from '../hooks/useTasks';
-import { useHabits, useHabitLogs, toISO } from '../hooks/useHabits';
+import { useHabits, useHabitLogs, useToggleHabitLog, toISO } from '../hooks/useHabits';
 import { useAppState } from '../store/appState';
 import { Pomodoro } from './Pomodoro';
 
@@ -25,6 +25,7 @@ export function HomeView() {
   const { data: allTasks = [] } = useAllTasks();
   const { data: habits = [] } = useHabits();
   const { data: habitLogs = [] } = useHabitLogs();
+  const toggleHabitLog = useToggleHabitLog();
   const setView = useAppState((s) => s.setView);
   const [now, setNow] = useState(new Date());
 
@@ -106,14 +107,19 @@ export function HomeView() {
         {/* Habits summary */}
         {activeHabits.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-3">
-              Habitos de hoje
-            </h2>
-            <button
-              onClick={() => setView({ type: 'habits' })}
-              className="w-full bg-white/10 hover:bg-white/15 rounded-xl p-5 text-left transition-colors border border-white/10 flex items-center justify-between"
-            >
-              <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider">
+                Habitos de hoje
+              </h2>
+              <button
+                onClick={() => setView({ type: 'habits' })}
+                className="text-xs text-white/50 hover:text-white/80 transition-colors"
+              >
+                Ver todos →
+              </button>
+            </div>
+            <div className="w-full bg-white/10 rounded-xl p-5 border border-white/10 flex items-center justify-between gap-4">
+              <div className="flex-shrink-0">
                 <div className="text-3xl font-bold text-white">
                   {habitsDoneToday}<span className="text-white/40 text-xl">/{activeHabits.length}</span>
                 </div>
@@ -121,24 +127,28 @@ export function HomeView() {
                   {habitsDoneToday === activeHabits.length ? 'Todos concluidos hoje 🎉' : `${activeHabits.length - habitsDoneToday} restantes`}
                 </div>
               </div>
-              <div className="flex gap-1.5">
-                {activeHabits.slice(0, 6).map((h) => {
-                  const done = habitLogs.some((l) => l.habit_id === h.Id && l.date === today);
+              <div className="flex gap-2 flex-wrap justify-end">
+                {activeHabits.map((h) => {
+                  const existingLog = habitLogs.find((l) => l.habit_id === h.Id && l.date === today);
+                  const done = !!existingLog;
                   return (
-                    <div
+                    <button
                       key={h.Id}
-                      className="w-9 h-9 rounded-full flex items-center justify-center text-base transition-all"
+                      onClick={() => toggleHabitLog.mutate({ habitId: h.Id, date: today, existingLogId: existingLog?.Id })}
+                      className="w-11 h-11 rounded-full flex items-center justify-center text-lg transition-all hover:scale-110 active:scale-95 ring-offset-2 ring-offset-[#025960]"
                       style={{
                         backgroundColor: done ? h.color : h.color + '22',
-                        opacity: done ? 1 : 0.5,
+                        opacity: done ? 1 : 0.6,
+                        boxShadow: done ? `0 0 0 2px ${h.color}` : 'none',
                       }}
+                      title={`${h.title}${done ? ' ✓' : ''}`}
                     >
                       {h.emoji || '⭐'}
-                    </div>
+                    </button>
                   );
                 })}
               </div>
-            </button>
+            </div>
           </div>
         )}
 
