@@ -49,7 +49,28 @@ export function TaskItem({ task, depth = 0, subtasks, onReorder }: TaskItemProps
   }, [editingTaskId, task.Id, task.title, setEditingTaskId]);
 
   useEffect(() => {
-    if (editing) inputRef.current?.focus();
+    if (!editing) return;
+    // Try focus immediately, then via rAF, then via timeout — ensures focus
+    // lands on the input even when this row was just mounted (e.g. after
+    // creating a new sibling/subtask via Enter or Shift+Enter).
+    inputRef.current?.focus();
+    inputRef.current?.select();
+    const raf = requestAnimationFrame(() => {
+      if (document.activeElement !== inputRef.current) {
+        inputRef.current?.focus();
+        inputRef.current?.select();
+      }
+    });
+    const t = setTimeout(() => {
+      if (document.activeElement !== inputRef.current) {
+        inputRef.current?.focus();
+        inputRef.current?.select();
+      }
+    }, 60);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t);
+    };
   }, [editing]);
 
   function handleSave(deleteIfEmpty = false) {
