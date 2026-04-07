@@ -41,7 +41,12 @@ export function HomeView() {
   const delegated = visible.filter((t) => !!t.delegated).length;
 
   const activeHabits = habits.filter((h) => !h.archived);
-  const today = toISO(new Date());
+  const todayDate = new Date();
+  const yesterdayDate = new Date(todayDate); yesterdayDate.setDate(todayDate.getDate() - 1);
+  const dayBeforeDate = new Date(todayDate); dayBeforeDate.setDate(todayDate.getDate() - 2);
+  const today = toISO(todayDate);
+  const yesterday = toISO(yesterdayDate);
+  const dayBefore = toISO(dayBeforeDate);
   const habitsDoneToday = activeHabits.filter((h) =>
     habitLogs.some((l) => l.habit_id === h.Id && l.date === today)
   ).length;
@@ -125,24 +130,56 @@ export function HomeView() {
                   {habitsDoneToday === activeHabits.length ? 'Todos concluidos hoje 🎉' : `${activeHabits.length - habitsDoneToday} restantes`}
                 </div>
               </button>
-              <div className="flex gap-2 flex-wrap justify-end">
+              <div className="flex gap-3 flex-wrap justify-end">
                 {activeHabits.map((h) => {
-                  const existingLog = habitLogs.find((l) => l.habit_id === h.Id && l.date === today);
-                  const done = !!existingLog;
+                  const days: { date: string; label: string }[] = [
+                    { date: dayBefore, label: 'A' },
+                    { date: yesterday, label: 'O' },
+                    { date: today, label: 'H' },
+                  ];
+                  const todayLog = habitLogs.find((l) => l.habit_id === h.Id && l.date === today);
+                  const todayDone = !!todayLog;
                   return (
-                    <button
-                      key={h.Id}
-                      onClick={() => toggleHabitLog.mutate({ habitId: h.Id, date: today, existingLogId: existingLog?.Id })}
-                      className="w-11 h-11 rounded-full flex items-center justify-center text-lg transition-all hover:scale-110 active:scale-95 ring-offset-2 ring-offset-[#025960]"
-                      style={{
-                        backgroundColor: done ? h.color : h.color + '22',
-                        opacity: done ? 1 : 0.6,
-                        boxShadow: done ? `0 0 0 2px ${h.color}` : 'none',
-                      }}
-                      title={`${h.title}${done ? ' ✓' : ''}`}
-                    >
-                      {h.emoji || '⭐'}
-                    </button>
+                    <div key={h.Id} className="flex flex-col items-center gap-1.5">
+                      <button
+                        onClick={() => toggleHabitLog.mutate({ habitId: h.Id, date: today, existingLogId: todayLog?.Id })}
+                        className="w-11 h-11 rounded-full flex items-center justify-center text-lg transition-all hover:scale-110 active:scale-95"
+                        style={{
+                          backgroundColor: todayDone ? h.color : h.color + '22',
+                          opacity: todayDone ? 1 : 0.6,
+                          boxShadow: todayDone ? `0 0 0 2px ${h.color}` : 'none',
+                        }}
+                        title={`${h.title} (hoje)${todayDone ? ' ✓' : ''}`}
+                      >
+                        {h.emoji || '⭐'}
+                      </button>
+                      <div className="flex gap-1">
+                        {days.map(({ date, label }) => {
+                          const log = habitLogs.find((l) => l.habit_id === h.Id && l.date === date);
+                          const done = !!log;
+                          const isToday = date === today;
+                          return (
+                            <button
+                              key={date}
+                              onClick={() => toggleHabitLog.mutate({ habitId: h.Id, date, existingLogId: log?.Id })}
+                              className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold transition-all hover:scale-125"
+                              style={{
+                                backgroundColor: done ? h.color : 'transparent',
+                                border: `1.5px solid ${done ? h.color : 'rgba(255,255,255,0.3)'}`,
+                                color: done ? '#fff' : 'rgba(255,255,255,0.5)',
+                              }}
+                              title={
+                                date === today ? `Hoje${done ? ' ✓' : ''}` :
+                                date === yesterday ? `Ontem${done ? ' ✓' : ''}` :
+                                `Anteontem${done ? ' ✓' : ''}`
+                              }
+                            >
+                              {!done && (isToday ? label : '')}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   );
                 })}
               </div>
