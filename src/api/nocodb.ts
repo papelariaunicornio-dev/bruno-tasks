@@ -7,6 +7,8 @@ const TABLE_IDS = {
   tasks: 'mbwvnajz8dhecby',
   tags: 'mfbwbxaz2gx0lov',
   task_tags: 'mbyev47waz1oyo5',
+  habits: 'm7f7ebnbvqru9qy',
+  habit_logs: 'ml3tqvx5ez7q3xd',
 } as const;
 
 type TableName = keyof typeof TABLE_IDS;

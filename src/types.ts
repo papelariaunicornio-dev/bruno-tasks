@@ -39,6 +39,31 @@ export interface TaskTag {
 
 export type SortCriteria = 'manual' | 'alphabetical' | 'created' | 'priority';
 
+export interface Habit {
+  Id: number;
+  title: string;
+  emoji: string;
+  color: string;
+  frequency: string;
+  target_per_week: number;
+  position: number;
+  archived: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface HabitLog {
+  Id: number;
+  habit_id: number;
+  date: string;
+  created_at: string;
+}
+
+export const HABIT_COLORS = [
+  '#ef4444', '#f97316', '#f59e0b', '#22c55e',
+  '#14b8a6', '#3b82f6', '#a855f7', '#ec4899',
+];
+
 export type ViewMode =
   | { type: 'home' }
   | { type: 'list'; listId: number }
@@ -48,7 +73,8 @@ export type ViewMode =
   | { type: 'priority' }
   | { type: 'delegated' }
   | { type: 'trash' }
-  | { type: 'stats' };
+  | { type: 'stats' }
+  | { type: 'habits' };
 
 export const TAG_COLORS = [
   { name: 'Red', value: '#ef4444' },

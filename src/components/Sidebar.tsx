@@ -470,6 +470,18 @@ export function Sidebar() {
         </button>
         <button
           className={`w-10 h-10 flex items-center justify-center rounded-md transition-colors ${
+            view.type === 'habits' ? 'bg-[#15BFAE]/10 text-[#15BFAE]' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+          }`}
+          onClick={() => setView({ type: 'habits' })}
+          title="Habitos"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M9 11l3 3L22 4" />
+            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+          </svg>
+        </button>
+        <button
+          className={`w-10 h-10 flex items-center justify-center rounded-md transition-colors ${
             view.type === 'stats' ? 'bg-[#15BFAE]/10 text-[#15BFAE]' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
           }`}
           onClick={() => setView({ type: 'stats' })}

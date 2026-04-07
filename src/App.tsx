@@ -3,6 +3,7 @@ import { Sidebar } from './components/Sidebar';
 import { TaskList } from './components/TaskList';
 import { StatsView } from './components/StatsView';
 import { HomeView } from './components/HomeView';
+import { HabitTrackerView } from './components/HabitTrackerView';
 import { CommandPalette } from './components/CommandPalette';
 import { QuickAdd } from './components/QuickAdd';
 import { Toast } from './components/Toast';
@@ -117,7 +118,7 @@ export default function App() {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col pt-14 md:pt-0 overflow-hidden" style={{ backgroundColor: '#025960' }}>
-        {view.type === 'home' ? <HomeView /> : view.type === 'stats' ? <StatsView /> : <TaskList />}
+        {view.type === 'home' ? <HomeView /> : view.type === 'stats' ? <StatsView /> : view.type === 'habits' ? <HabitTrackerView /> : <TaskList />}
       </div>
 
       <CommandPalette />
