@@ -40,6 +40,7 @@ export interface TaskTag {
 export type SortCriteria = 'manual' | 'alphabetical' | 'created' | 'priority';
 
 export type ViewMode =
+  | { type: 'home' }
   | { type: 'list'; listId: number }
   | { type: 'tag'; tagId: number }
   | { type: 'all' }

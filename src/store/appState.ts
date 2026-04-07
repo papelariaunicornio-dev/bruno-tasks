@@ -26,7 +26,7 @@ interface AppState {
 }
 
 export const useAppState = create<AppState>((set) => ({
-  view: { type: 'all' },
+  view: { type: 'home' },
   sortBy: 'manual',
   kanbanMode: false,
   collapsedGroups: new Set<string>(),

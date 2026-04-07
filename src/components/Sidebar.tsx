@@ -248,7 +248,12 @@ export function Sidebar() {
       <div className="flex-shrink-0">
         {/* Header */}
         <div className="px-4 pt-5 pb-3 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-gray-800 tracking-tight">Bruno Tasks</h1>
+          <button
+            onClick={() => setView({ type: 'home' })}
+            className="text-lg font-bold text-gray-800 tracking-tight hover:text-[#15BFAE] transition-colors"
+          >
+            Bruno Tasks
+          </button>
           <div ref={addMenuRef} className="relative">
             <button
               className="w-7 h-7 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"

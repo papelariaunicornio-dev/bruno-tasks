@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { TaskList } from './components/TaskList';
 import { StatsView } from './components/StatsView';
+import { HomeView } from './components/HomeView';
 import { CommandPalette } from './components/CommandPalette';
 import { QuickAdd } from './components/QuickAdd';
 import { Toast } from './components/Toast';
@@ -94,7 +95,7 @@ export default function App() {
             <path d="M3 12h18M3 6h18M3 18h18" />
           </svg>
         </button>
-        <h1 className="text-white font-semibold text-base">Bruno Tasks</h1>
+        <button onClick={() => useAppState.getState().setView({ type: 'home' })} className="text-white font-semibold text-base">Bruno Tasks</button>
       </div>
 
       {/* Backdrop (mobile) */}
@@ -116,7 +117,7 @@ export default function App() {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col pt-14 md:pt-0 overflow-hidden" style={{ backgroundColor: '#025960' }}>
-        {view.type === 'stats' ? <StatsView /> : <TaskList />}
+        {view.type === 'home' ? <HomeView /> : view.type === 'stats' ? <StatsView /> : <TaskList />}
       </div>
 
       <CommandPalette />
