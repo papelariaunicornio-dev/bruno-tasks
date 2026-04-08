@@ -1,0 +1,9 @@
+# Allowlist de segredos aceitos (débito técnico conhecido)
+#
+# src/api/nocodb.ts linha 2: TOKEN NocoDB hardcoded no frontend.
+# Razão: app client-side sem backend proxy. O token fica visível no bundle JS
+# servido ao navegador de qualquer forma, então comitá-lo no git não amplia
+# a exposição já existente. A solução correta é criar um backend proxy ou
+# usar um token NocoDB com escopo restrito às tabelas do bruno-tasks.
+# Data: 2026-04-08
+src/api/nocodb.ts:generic-api-key:2

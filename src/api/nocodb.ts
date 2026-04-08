@@ -1,5 +1,5 @@
 const BASE_URL = 'https://nocodb.papelariaunicornio.com.br/api/v1';
-const TOKEN = 'HEP4jvJaAZRZxR75QX1HRb0HMgJ0R7_5-sEA5Orc';
+const TOKEN = 'SyzPCPvtvO9ugVo3GkE3ZD198cVe6MSsvpbxgChr';
 const PROJECT_ID = 'pno23ac5b1mk990';
 
 const TABLE_IDS = {
