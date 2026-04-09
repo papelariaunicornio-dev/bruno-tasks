@@ -8,7 +8,10 @@ import { TagBadge } from './TagBadge';
 import { TagSelector } from './TagSelector';
 import type { Task } from '../types';
 
-marked.setOptions({ breaks: true, gfm: true });
+const renderer = new marked.Renderer();
+renderer.link = ({ href, text }) =>
+  `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+marked.setOptions({ breaks: true, gfm: true, renderer });
 
 interface TaskItemProps {
   task: Task;
