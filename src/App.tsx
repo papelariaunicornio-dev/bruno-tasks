@@ -62,6 +62,7 @@ export default function App() {
         document.title = `✓ "${taskTitle}" adicionada`;
         setTimeout(() => { document.title = 'Bruno Tasks'; }, 2000);
         useAppState.getState().showToast(`"${taskTitle}" adicionada na Inbox`);
+        useAppState.getState().setView({ type: 'list', listId: inbox.Id });
       }
     }
 
