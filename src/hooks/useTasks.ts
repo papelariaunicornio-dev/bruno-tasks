@@ -27,7 +27,7 @@ export function useAllTasks() {
 export function useCreateTask() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: Partial<Task> & { _autoFocus?: boolean }) =>
+    mutationFn: (data: Partial<Task> & { _autoFocus?: boolean; _autoOpenTags?: boolean }) =>
       api.create<Task>('tasks', {
         title: data.title,
         list_id: data.list_id,
@@ -66,16 +66,22 @@ export function useCreateTask() {
       if (data._autoFocus) {
         useAppState.getState().setEditingTaskId(tempId);
       }
+      if (data._autoOpenTags) {
+        useAppState.getState().setTagSelectorTaskId(tempId);
+      }
       return { previous, tempId };
     },
     onSuccess: (newTask, _vars, context) => {
-      // Replace temp with real, and update editingTaskId if it was pointing to temp
-      const currentEditing = useAppState.getState().editingTaskId;
+      // Replace temp with real, and update editingTaskId/tagSelectorTaskId if pointing to temp
+      const state = useAppState.getState();
       qc.setQueryData<Task[]>(['tasks', 'all'], (old = []) =>
         old.map((t) => (t.Id === context?.tempId ? newTask : t))
       );
-      if (currentEditing === context?.tempId) {
-        useAppState.getState().setEditingTaskId(newTask.Id);
+      if (state.editingTaskId === context?.tempId) {
+        state.setEditingTaskId(newTask.Id);
+      }
+      if (state.tagSelectorTaskId === context?.tempId) {
+        state.setTagSelectorTaskId(newTask.Id);
       }
     },
     onError: (_err, _vars, context) => {

@@ -43,6 +43,8 @@ export function TaskItem({ task, depth = 0, subtasks, onReorder }: TaskItemProps
   const showToast = useAppState((s) => s.showToast);
   const editingTaskId = useAppState((s) => s.editingTaskId);
   const setEditingTaskId = useAppState((s) => s.setEditingTaskId);
+  const tagSelectorTaskId = useAppState((s) => s.tagSelectorTaskId);
+  const setTagSelectorTaskId = useAppState((s) => s.setTagSelectorTaskId);
 
   const myTagIds = taskTags.filter((tt) => tt.task_id === task.Id).map((tt) => tt.tag_id);
   const myTags = allTags.filter((t) => myTagIds.includes(t.Id));
@@ -59,6 +61,13 @@ export function TaskItem({ task, depth = 0, subtasks, onReorder }: TaskItemProps
       setEditingTaskId(null);
     }
   }, [editingTaskId, task.Id, task.title, setEditingTaskId]);
+
+  useEffect(() => {
+    if (tagSelectorTaskId === task.Id) {
+      setShowTagSelector(true);
+      setTagSelectorTaskId(null);
+    }
+  }, [tagSelectorTaskId, task.Id, setTagSelectorTaskId]);
 
   useEffect(() => {
     setNoteValue(task.description ?? '');

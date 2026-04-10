@@ -116,7 +116,8 @@ export function TaskList() {
   }
 
   function handleNewTask(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' && newTaskTitle.trim()) {
+    if ((e.key === 'Enter' || e.key === 'Tab') && newTaskTitle.trim()) {
+      e.preventDefault();
       const inbox = lists.find((l) => l.title === 'Inbox');
       const listId = view.type === 'list' ? view.listId : inbox?.Id || lists[0]?.Id;
       if (!listId) return;
@@ -124,10 +125,14 @@ export function TaskList() {
       if (view.type === 'in_progress') extra.in_progress = true;
       if (view.type === 'priority') extra.priority = true;
       if (view.type === 'delegated') extra.delegated = true;
-      createTask.mutate({ title: newTaskTitle.trim(), list_id: listId, ...extra });
+      createTask.mutate({
+        title: newTaskTitle.trim(),
+        list_id: listId,
+        ...extra,
+        _autoFocus: true,
+        _autoOpenTags: e.key === 'Tab',
+      });
       setNewTaskTitle('');
-      // Keep focus on the input for sequential task creation
-      newTaskInputRef.current?.focus();
     }
     if (e.key === 'Escape') {
       setNewTaskTitle('');

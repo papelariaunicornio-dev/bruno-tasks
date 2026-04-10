@@ -12,6 +12,7 @@ interface AppState {
   kanbanMode: boolean;
   collapsedGroups: Set<string>;
   editingTaskId: number | null;
+  tagSelectorTaskId: number | null;
   sidebarOpen: boolean;
   toast: ToastState | null;
   setView: (view: ViewMode) => void;
@@ -19,6 +20,7 @@ interface AppState {
   toggleKanban: () => void;
   toggleGroup: (group: string) => void;
   setEditingTaskId: (id: number | null) => void;
+  setTagSelectorTaskId: (id: number | null) => void;
   setSidebarOpen: (open: boolean) => void;
   toggleSidebar: () => void;
   showToast: (message: string, onUndo?: () => void) => void;
@@ -31,6 +33,7 @@ export const useAppState = create<AppState>((set) => ({
   kanbanMode: false,
   collapsedGroups: new Set<string>(),
   editingTaskId: null,
+  tagSelectorTaskId: null,
   sidebarOpen: false,
   toast: null,
   setView: (view) => set({ view, sidebarOpen: false }), // Close sidebar on mobile when selecting
@@ -44,6 +47,7 @@ export const useAppState = create<AppState>((set) => ({
       return { collapsedGroups: next };
     }),
   setEditingTaskId: (editingTaskId) => set({ editingTaskId }),
+  setTagSelectorTaskId: (tagSelectorTaskId) => set({ tagSelectorTaskId }),
   setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
   toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
   showToast: (message, onUndo) => set({ toast: { message, onUndo } }),
