@@ -246,9 +246,9 @@ function HabitMonthCalendar({ habit, logs, onToggle }: HabitMonthCalendarProps) 
             <button
               key={date}
               onClick={() => onToggle(habit.Id, date)}
-              className="aspect-square flex items-center justify-center rounded-md text-xs transition-all hover:scale-105"
+              className="aspect-square flex items-center justify-center rounded-lg text-xs transition-all hover:scale-105"
               style={{
-                backgroundColor: done ? habit.color : today ? '#f3f4f6' : 'transparent',
+                backgroundColor: done ? habit.color : today ? '#e5e7eb' : '#f9fafb',
                 color: done ? 'white' : today ? '#1f2937' : '#9ca3af',
                 fontWeight: today ? 700 : 400,
               }}
@@ -261,16 +261,16 @@ function HabitMonthCalendar({ habit, logs, onToggle }: HabitMonthCalendarProps) 
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2 mt-4">
-        <div className="bg-gray-50 rounded-lg p-2 text-center">
-          <div className="text-lg font-bold" style={{ color: habit.color }}>{habitLogsThisMonth.length}</div>
+        <div className="bg-gray-50 rounded-lg p-3 text-center">
+          <div className="text-2xl font-bold" style={{ color: habit.color }}>{habitLogsThisMonth.length}</div>
           <div className="text-[10px] text-gray-500">Neste mes</div>
         </div>
-        <div className="bg-gray-50 rounded-lg p-2 text-center">
-          <div className="text-lg font-bold" style={{ color: habit.color }}>{stats.current}</div>
+        <div className="bg-gray-50 rounded-lg p-3 text-center">
+          <div className="text-2xl font-bold" style={{ color: habit.color }}>{stats.current}</div>
           <div className="text-[10px] text-gray-500">Streak atual</div>
         </div>
-        <div className="bg-gray-50 rounded-lg p-2 text-center">
-          <div className="text-lg font-bold" style={{ color: habit.color }}>{stats.best}</div>
+        <div className="bg-gray-50 rounded-lg p-3 text-center">
+          <div className="text-2xl font-bold" style={{ color: habit.color }}>{stats.best}</div>
           <div className="text-[10px] text-gray-500">Melhor streak</div>
         </div>
       </div>
