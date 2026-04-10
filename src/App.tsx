@@ -61,6 +61,7 @@ export default function App() {
         window.history.replaceState({}, '', window.location.pathname);
         document.title = `✓ "${taskTitle}" adicionada`;
         setTimeout(() => { document.title = 'Bruno Tasks'; }, 2000);
+        useAppState.getState().showToast(`"${taskTitle}" adicionada na Inbox`);
       }
     }
 

@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useAllTasks } from '../hooks/useTasks';
+import { useState, useEffect, useRef } from 'react';
+import { useAllTasks, useCreateTask } from '../hooks/useTasks';
+import { useLists } from '../hooks/useLists';
 import { useHabits, useHabitLogs, useToggleHabitLog, toISO } from '../hooks/useHabits';
 import { useAppState } from '../store/appState';
 import { Pomodoro } from './Pomodoro';
@@ -23,11 +24,16 @@ function capitalize(s: string) {
 
 export function HomeView() {
   const { data: allTasks = [] } = useAllTasks();
+  const { data: lists = [] } = useLists();
+  const createTask = useCreateTask();
   const { data: habits = [] } = useHabits();
   const { data: habitLogs = [] } = useHabitLogs();
   const toggleHabitLog = useToggleHabitLog();
   const setView = useAppState((s) => s.setView);
+  const showToast = useAppState((s) => s.showToast);
   const [now, setNow] = useState(new Date());
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const newTaskInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 1000);
@@ -70,6 +76,38 @@ export function HomeView() {
           <p className="text-white/70 text-base">
             {capitalize(formatDate(now))}
           </p>
+        </div>
+
+        {/* Quick add */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 px-4 py-4 bg-white/20 backdrop-blur-sm rounded-xl border border-white/20">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="opacity-60 flex-shrink-0">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <input
+              ref={newTaskInputRef}
+              type="text"
+              value={newTaskTitle}
+              onChange={(e) => setNewTaskTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newTaskTitle.trim()) {
+                  const inbox = lists.find((l) => l.title === 'Inbox');
+                  const listId = inbox?.Id || lists[0]?.Id;
+                  if (!listId) return;
+                  createTask.mutate({ title: newTaskTitle.trim(), list_id: listId });
+                  showToast(`"${newTaskTitle.trim()}" adicionada na Inbox`);
+                  setNewTaskTitle('');
+                  newTaskInputRef.current?.focus();
+                }
+                if (e.key === 'Escape') {
+                  setNewTaskTitle('');
+                  newTaskInputRef.current?.blur();
+                }
+              }}
+              placeholder="Adicionar tarefa na Inbox..."
+              className="flex-1 bg-transparent text-base outline-none text-white placeholder-white/60"
+            />
+          </div>
         </div>
 
         {/* Task summary */}
