@@ -253,7 +253,7 @@ export function TaskItem({ task, depth = 0, subtasks, onReorder }: TaskItemProps
           ))}
         </div>
 
-        {/* Tag + Note buttons (vertical stack) */}
+        {/* Tag + Note + Subtask buttons (vertical stack) */}
         <div className="flex flex-col items-center gap-1 flex-shrink-0">
           <button
             className="opacity-0 group-hover:opacity-30 hover:!opacity-100 text-gray-400 text-xs leading-none"
@@ -261,6 +261,15 @@ export function TaskItem({ task, depth = 0, subtasks, onReorder }: TaskItemProps
             title="Tags (Tab)"
           >
             #
+          </button>
+          <button
+            className="opacity-30 md:opacity-0 group-hover:opacity-30 hover:!opacity-100 text-gray-400 leading-none"
+            onClick={() => createTask.mutate({ title: '', list_id: task.list_id, parent_id: task.Id, _autoFocus: true })}
+            title="Adicionar subtarefa"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
           </button>
           <button
             className={`leading-none transition-opacity ${
