@@ -95,7 +95,8 @@ export function TaskList() {
     ? filteredTasks.filter((t) => !t.parent_id || !filteredIds.has(t.parent_id))
     : filteredTasks.filter((t) => !t.parent_id);
   const pendingTasks = rootTasks.filter((t) => !t.completed);
-  const completedTasks = rootTasks.filter((t) => !!t.completed);
+  const completedTasks = rootTasks.filter((t) => !!t.completed)
+    .sort((a, b) => new Date(b.completed_at ?? 0).getTime() - new Date(a.completed_at ?? 0).getTime());
   const allVisible = allTasks.filter((t) => !t.deleted);
   const getSubtasks = (parentId: number) =>
     isFilterView
