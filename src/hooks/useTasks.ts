@@ -36,7 +36,8 @@ export function useCreateTask() {
         priority: data.priority ?? false,
         in_progress: data.in_progress ?? false,
         delegated: data.delegated ?? false,
-        position: Date.now(),
+        // Negative position so new tasks go to the top of manual sort (asc)
+        position: -Date.now(),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }),
@@ -54,7 +55,7 @@ export function useCreateTask() {
         delegated: data.delegated ?? false,
         deleted: false,
         deleted_at: null,
-        position: Date.now(),
+        position: -Date.now(),
         list_id: data.list_id ?? 0,
         parent_id: data.parent_id ?? null,
         completed_at: null,
