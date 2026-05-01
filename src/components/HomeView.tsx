@@ -80,8 +80,8 @@ export function HomeView() {
 
         {/* Quick add */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 px-4 py-4 bg-white/20 backdrop-blur-sm rounded-xl border border-white/20">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="opacity-60 flex-shrink-0">
+          <div className="flex items-center gap-3 px-5 py-4 bg-white rounded-xl shadow-md focus-within:shadow-lg transition-shadow">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#15BFAE" strokeWidth="2.5" className="flex-shrink-0">
               <path d="M12 5v14M5 12h14" />
             </svg>
             <input
@@ -105,8 +105,9 @@ export function HomeView() {
                 }
               }}
               placeholder="Adicionar tarefa na Inbox..."
-              className="flex-1 bg-transparent text-base outline-none text-white placeholder-white/60"
+              className="flex-1 bg-transparent text-base outline-none text-gray-800 placeholder-gray-400"
             />
+            <kbd className="text-[10px] bg-gray-100 text-gray-400 px-2 py-1 rounded">Enter</kbd>
           </div>
         </div>
 
