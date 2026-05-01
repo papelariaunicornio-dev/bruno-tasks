@@ -272,6 +272,30 @@ export function TaskItem({ task, depth = 0, subtasks, onReorder }: TaskItemProps
             </svg>
           </button>
           <button
+            className="opacity-0 group-hover:opacity-30 hover:!opacity-100 text-gray-400 leading-none"
+            onClick={async (e) => {
+              e.stopPropagation();
+              const lines: string[] = [];
+              lines.push(`- ${task.title || ''}`);
+              for (const sub of subtasks) {
+                lines.push(`  - ${sub.title || ''}`);
+              }
+              const text = lines.join('\n');
+              try {
+                await navigator.clipboard.writeText(text);
+                showToast('Tarefa copiada');
+              } catch {
+                showToast('Erro ao copiar');
+              }
+            }}
+            title="Copiar tarefa"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+            </svg>
+          </button>
+          <button
             className={`leading-none transition-opacity ${
               hasNote
                 ? 'opacity-70 hover:opacity-100 text-[#15BFAE]'

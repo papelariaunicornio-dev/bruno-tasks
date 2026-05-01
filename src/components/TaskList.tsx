@@ -42,6 +42,7 @@ export function TaskList() {
   const updateTask = useUpdateTask();
   const bulkUpdate = useBulkUpdatePositions();
   const { view, sortBy, kanbanMode, toggleKanban } = useAppState();
+  const showToast = useAppState((s) => s.showToast);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [showCompleted, setShowCompleted] = useState(true);
   const newTaskInputRef = useRef<HTMLInputElement>(null);
@@ -103,6 +104,27 @@ export function TaskList() {
       ? sortTasks(filteredTasks.filter((t) => t.parent_id === parentId), sortBy)
       : sortTasks(allVisible.filter((t) => t.parent_id === parentId), sortBy);
   const sortedActiveTasks = sortTasks(pendingTasks, sortBy);
+
+  async function handleCopyAll() {
+    const lines: string[] = [];
+    for (const t of sortedActiveTasks) {
+      lines.push(`- ${t.title || ''}`);
+      const subs = getSubtasks(t.Id).filter((s) => !s.completed);
+      for (const s of subs) {
+        lines.push(`  - ${s.title || ''}`);
+      }
+    }
+    if (!lines.length) {
+      showToast('Nenhuma tarefa em aberto');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(lines.join('\n'));
+      showToast(`${sortedActiveTasks.length} ${sortedActiveTasks.length === 1 ? 'tarefa copiada' : 'tarefas copiadas'}`);
+    } catch {
+      showToast('Erro ao copiar');
+    }
+  }
 
   function handleReorder(draggedId: number, targetId: number) {
     if (draggedId === targetId) return;
@@ -296,6 +318,16 @@ export function TaskList() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-white">{viewTitle}</h1>
+            <button
+              onClick={handleCopyAll}
+              className="text-white/50 hover:text-white transition-colors"
+              title="Copiar todas as tarefas em aberto"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+              </svg>
+            </button>
             {view.type === 'list' && (
               <button
                 onClick={toggleKanban}

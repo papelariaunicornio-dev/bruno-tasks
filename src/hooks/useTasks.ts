@@ -27,8 +27,20 @@ export function useAllTasks() {
 export function useCreateTask() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: Partial<Task> & { _autoFocus?: boolean; _autoOpenTags?: boolean }) =>
-      api.create<Task>('tasks', {
+    mutationFn: (data: Partial<Task> & { _autoFocus?: boolean; _autoOpenTags?: boolean }) => {
+      // Position = (current min - 1000) so new task goes to top of manual sort (asc).
+      // Include optimistic tasks too so back-to-back creations stack correctly.
+      // The first creation sees only the saved tasks' min (large) and subtracts 1000;
+      // subsequent ones see the prior optimistic at that lower position.
+      // The optimistic for THIS task hasn't been added yet (onMutate already ran for it
+      // but we're inside mutationFn now — actually onMutate has run, so its optimistic
+      // is in cache. We compute the same value here to keep them in sync.)
+      const all = qc.getQueryData<Task[]>(['tasks', 'all']) ?? [];
+      const minPos = all.length ? Math.min(...all.map((t) => t.position ?? 0)) : 0;
+      // Since onMutate already added an optimistic task at minPos (using prior min - 1000),
+      // we can use that exact value here for the persisted record.
+      const position = minPos;
+      return api.create<Task>('tasks', {
         title: data.title,
         list_id: data.list_id,
         parent_id: data.parent_id,
@@ -36,15 +48,16 @@ export function useCreateTask() {
         priority: data.priority ?? false,
         in_progress: data.in_progress ?? false,
         delegated: data.delegated ?? false,
-        // Negative position so new tasks go to the top of manual sort (asc)
-        position: -Date.now(),
+        position,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-      }),
+      });
+    },
     onMutate: async (data) => {
       await qc.cancelQueries({ queryKey: ['tasks', 'all'] });
       const previous = qc.getQueryData<Task[]>(['tasks', 'all']);
       const tempId = tempIdCounter--;
+      const minPos = previous?.length ? Math.min(...previous.map((t) => t.position ?? 0)) : 0;
       const optimisticTask: Task = {
         Id: tempId,
         title: data.title ?? '',
@@ -55,7 +68,7 @@ export function useCreateTask() {
         delegated: data.delegated ?? false,
         deleted: false,
         deleted_at: null,
-        position: -Date.now(),
+        position: minPos - 1000,
         list_id: data.list_id ?? 0,
         parent_id: data.parent_id ?? null,
         completed_at: null,
