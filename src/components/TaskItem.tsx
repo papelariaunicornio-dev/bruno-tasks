@@ -220,6 +220,7 @@ export function TaskItem({ task, depth = 0, subtasks, onReorder }: TaskItemProps
             <input
               ref={inputRef}
               type="text"
+              autoFocus
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
               onBlur={() => handleSave()}

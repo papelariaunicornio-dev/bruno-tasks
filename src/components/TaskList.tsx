@@ -128,14 +128,29 @@ export function TaskList() {
 
   function handleReorder(draggedId: number, targetId: number) {
     if (draggedId === targetId) return;
-    const list = [...sortedActiveTasks];
-    const oldIndex = list.findIndex((t) => t.Id === draggedId);
-    const newIndex = list.findIndex((t) => t.Id === targetId);
-    if (oldIndex === -1 || newIndex === -1) return;
-    const [moved] = list.splice(oldIndex, 1);
-    list.splice(newIndex, 0, moved);
-    const updates = list.map((t, i) => ({ Id: t.Id, position: i }));
-    bulkUpdate.mutate(updates);
+    const dragged = allVisible.find((t) => t.Id === draggedId);
+    if (dragged?.parent_id) {
+      // Subtask reorder — reorder within siblings only
+      const siblings = sortTasks(
+        allVisible.filter((t) => t.parent_id === dragged.parent_id && !t.completed),
+        sortBy
+      );
+      const oldIndex = siblings.findIndex((t) => t.Id === draggedId);
+      const newIndex = siblings.findIndex((t) => t.Id === targetId);
+      if (oldIndex === -1 || newIndex === -1) return;
+      const [moved] = siblings.splice(oldIndex, 1);
+      siblings.splice(newIndex, 0, moved);
+      bulkUpdate.mutate(siblings.map((t, i) => ({ Id: t.Id, position: i * 1000 })));
+    } else {
+      // Root task reorder
+      const list = [...sortedActiveTasks];
+      const oldIndex = list.findIndex((t) => t.Id === draggedId);
+      const newIndex = list.findIndex((t) => t.Id === targetId);
+      if (oldIndex === -1 || newIndex === -1) return;
+      const [moved] = list.splice(oldIndex, 1);
+      list.splice(newIndex, 0, moved);
+      bulkUpdate.mutate(list.map((t, i) => ({ Id: t.Id, position: i })));
+    }
   }
 
   function handleNewTask(e: React.KeyboardEvent) {
