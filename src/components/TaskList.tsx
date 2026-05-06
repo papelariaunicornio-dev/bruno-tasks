@@ -212,7 +212,7 @@ export function TaskList() {
           e.dataTransfer.setData('task-id', String(task.Id));
           e.dataTransfer.effectAllowed = 'move';
         }}
-        className={`bg-white rounded-lg p-3 mb-2 shadow-sm hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing border border-gray-100 ${
+        className={`bg-white rounded-lg p-3 mb-2 shadow-sm hover:shadow-md transition-shadow border border-gray-100 ${
           isCompleted ? 'opacity-60' : ''
         }`}
       >

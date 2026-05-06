@@ -155,11 +155,6 @@ export function TaskItem({ task, depth = 0, subtasks, onReorder }: TaskItemProps
       <div
         style={{ marginLeft: `${depth * 24}px` }}
         className="flex items-start mb-[2px]"
-        draggable
-        onDragStart={(e) => {
-          e.dataTransfer.setData('task-id', String(task.Id));
-          e.dataTransfer.effectAllowed = 'move';
-        }}
         onDragOver={(e) => {
           if (e.dataTransfer.types.includes('task-id')) {
             e.preventDefault();
@@ -194,10 +189,26 @@ export function TaskItem({ task, depth = 0, subtasks, onReorder }: TaskItemProps
         )}
 
       <div
-        className={`group relative flex-1 flex items-start gap-2 pl-2 pr-3 py-3 bg-white rounded-md shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-shadow cursor-grab active:cursor-grabbing ${
+        className={`group relative flex-1 flex items-start gap-2 pr-3 py-3 bg-white rounded-md shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-shadow ${
           isCompleted ? 'opacity-70' : ''
         } ${dropIndicator ? 'ring-2 ring-[#15BFAE] ring-offset-1' : ''}`}
       >
+        {/* Drag handle */}
+        <div
+          draggable
+          onDragStart={(e) => {
+            e.dataTransfer.setData('task-id', String(task.Id));
+            e.dataTransfer.effectAllowed = 'move';
+          }}
+          className="flex-shrink-0 self-stretch flex items-center px-1 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-30 hover:!opacity-60 text-gray-400"
+          title="Arrastar para reordenar"
+        >
+          <svg width="12" height="16" viewBox="0 0 12 20" fill="currentColor">
+            <circle cx="4" cy="4" r="1.5"/><circle cx="8" cy="4" r="1.5"/>
+            <circle cx="4" cy="10" r="1.5"/><circle cx="8" cy="10" r="1.5"/>
+            <circle cx="4" cy="16" r="1.5"/><circle cx="8" cy="16" r="1.5"/>
+          </svg>
+        </div>
         {/* Circular checkbox */}
         <button
           className={`w-7 h-7 mt-1 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${

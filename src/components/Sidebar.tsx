@@ -221,7 +221,7 @@ export function Sidebar() {
             draggable
             onDragStart={(e) => handleDragStart(e, list.Id)}
             onContextMenu={(e) => handleContextMenu(e, 'list', list.Id)}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 ${indented ? 'pl-7' : ''} text-base transition-colors rounded-md cursor-grab active:cursor-grabbing ${
+            className={`w-full flex items-center gap-3 px-3 py-2.5 ${indented ? 'pl-7' : ''} text-base transition-colors rounded-md cursor-pointer ${
               isTaskDropTarget ? 'bg-[#15BFAE]/20 ring-1 ring-[#15BFAE]' :
               isActive ? 'bg-[#15BFAE]/10 text-[#15BFAE] font-medium' : 'text-gray-700 hover:bg-gray-100'
             }`}
